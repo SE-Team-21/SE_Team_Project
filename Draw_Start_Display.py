@@ -21,9 +21,10 @@ def draw(screen, mode, running):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
                     if idx==0:
-                        print('Single Player')
+                        mode[0]=3
                     elif idx==1:
                         mode[0]=2
+                        mode[1]=1
                     elif idx==2:
                         running[0] = False
         elif Button_list[0].rect.collidepoint(mouse_pos): # for문으로 수정해야할듯
