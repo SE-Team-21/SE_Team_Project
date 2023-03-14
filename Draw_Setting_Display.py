@@ -3,7 +3,7 @@ from Text_Class import Text
 import pygame as pg
 
 Button_list = []
-Button_list.append(Button((400, 350), (200, 60), 'Return to Main Menu'))
+Button_list.append(Button((400, 350), (200, 60), 'Back'))
 Text_list = []
 Text_list.append(Text((320, 60), 40, 'Display'))
 Text_list.append(Text((320, 120), 40, 'Key Setting'))
@@ -21,7 +21,10 @@ def draw(screen, mode, running):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
                     if idx==0:
-                        mode[0]=1
+                        if mode[1]==1:
+                            mode[0]=1
+                        elif mode[1]==4:
+                            mode[0]=4
         elif Button_list[0].rect.collidepoint(mouse_pos):
             Button_list[0].above()
         else:
