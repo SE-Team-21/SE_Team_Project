@@ -3,12 +3,12 @@ from Text_Class import Text
 import pygame as pg
 
 Button_list = []
-Button_list.append(Button((400, 200), (100, 50), 'SINGLE PLAYER'))
+Button_list.append(Button((400, 200), (100, 50), 'RESUME'))
 Button_list.append(Button((400, 300), (100, 50), 'OPTIONS'))
-Button_list.append(Button((400, 400), (100, 50), 'QUIT'))
+Button_list.append(Button((400, 400), (100, 50), 'GAME QUIT'))
 
 Text_list = []
-Text_list.append(Text((320, 60), 40, 'UNO Game'))
+Text_list.append(Text((320, 60), 40, 'PAUSE'))
 
 def draw(screen, mode, running):
     for event in pg.event.get():
@@ -24,9 +24,9 @@ def draw(screen, mode, running):
                         mode[0]=3
                     elif idx==1:
                         mode[0]=2
-                        mode[1]=1
+                        mode[1]=4
                     elif idx==2:
-                        running[0] = False
+                        mode[0]=1
         elif Button_list[0].rect.collidepoint(mouse_pos): # for문으로 수정해야할듯
             Button_list[0].above()
         elif Button_list[1].rect.collidepoint(mouse_pos):
