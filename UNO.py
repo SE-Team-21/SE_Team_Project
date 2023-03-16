@@ -7,9 +7,7 @@ import Draw_Stop_Display
 def pygame_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
-    screen_width = 800 # 화면 크기 조절시 변경 바람
-    screen_height = 600
-    screen = pg.display.set_mode((screen_width, screen_height))
+    screen = pg.display.set_mode((800,600))
     
     running = [True]
     mode = [1, 1] # mode[0] = 다음 화면, mode[1] = 이전 화면
