@@ -1,6 +1,7 @@
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
+import uno.constants as C
 
 Text_list = []
 Text_list.append(Text((220, 60), 40, 'Playing Display'))
@@ -13,7 +14,7 @@ def draw(screen, mode, running):
             running[0] = False
         elif event.type == pg.KEYUP:
             if event.key == pg.K_ESCAPE:
-                mode[0]=4
+                mode[C.NEXT_SCREEN] = C.STOP
                 
     screen.fill((255, 255, 255))
     for item in Text_list:
