@@ -1,6 +1,7 @@
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
+import uno.constants as C
 
 Button_list = []
 Button_list.append(Button((400, 200), (100, 50), 'SINGLE PLAYER'))
@@ -24,11 +25,11 @@ def draw(screen, mode, running):
             for idx, item in enumerate(Button_list):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
-                    if idx==0:                            
-                        mode[0]=3
-                    elif idx==1:
-                        mode[0]=2
-                        mode[1]=1
+                    if idx == 0:                            
+                        mode[0] = C.PLAYING
+                    elif idx == 1:
+                        mode[0] = C.SETTING
+                        mode[1] = C.START
                     elif idx==2:
                         running[0] = False
         else:

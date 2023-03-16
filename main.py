@@ -3,22 +3,25 @@ import uno.Draw_Start_Display as Draw_Start_Display
 import uno.Draw_Setting_Display as Draw_Setting_Display
 import uno.Draw_Playing_Display as Draw_Playing_Display
 import uno.Draw_Stop_Display as Draw_Stop_Display
+import uno.constants as C
 
-def pygame_mainloop():
+
+
+def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
     screen = pg.display.set_mode((800,600))
     
     running = [True]
-    mode = [1, 1] # mode[0] = 다음 화면, mode[1] = 이전 화면
+    mode = [C.START, C.START] # mode[0] = 다음 화면, mode[1] = 이전 화면
     while running[0]:
-        if mode[0]==1:
+        if mode[0] == C.START:
             Draw_Start_Display.draw(screen, mode, running)
-        elif mode[0]==2:
+        elif mode[0] == C.SETTING:
             Draw_Setting_Display.draw(screen, mode, running)
-        elif mode[0]==3:
+        elif mode[0] == C.PLAYING:
             Draw_Playing_Display.draw(screen, mode, running)
-        elif mode[0]==4:
+        elif mode[0] == C.STOP:
             Draw_Stop_Display.draw(screen, mode, running)
         else:
             pass
@@ -26,4 +29,4 @@ def pygame_mainloop():
     pg.quit()
 
 if __name__ == "__main__":
-    pygame_mainloop()
+    uno_mainloop()
