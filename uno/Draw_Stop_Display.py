@@ -1,6 +1,7 @@
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
+import uno.constants as C
 
 Button_list = []
 Button_list.append(Button((400, 200), (100, 50), 'RESUME'))
@@ -25,12 +26,12 @@ def draw(screen, mode, running):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
                     if idx==0:
-                        mode[0]=3
+                        mode[C.NEXT_SCREEN] = C.PLAYING
                     elif idx==1:
-                        mode[0]=2
-                        mode[1]=4
+                        mode[C.NEXT_SCREEN] = C.SETTING
+                        mode[C.PREV_SCREEN] = C.STOP
                     elif idx==2:
-                        mode[0]=1
+                        mode[C.NEXT_SCREEN] = C.START
         else:
             if flag:
                 for item in Button_list:

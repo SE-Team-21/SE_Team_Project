@@ -15,13 +15,13 @@ def uno_mainloop():
     running = [True]
     mode = [C.START, C.START] # mode[0] = 다음 화면, mode[1] = 이전 화면
     while running[0]:
-        if mode[0] == C.START:
+        if mode[C.NEXT_SCREEN] == C.START:
             Draw_Start_Display.draw(screen, mode, running)
-        elif mode[0] == C.SETTING:
+        elif mode[C.NEXT_SCREEN] == C.SETTING:
             Draw_Setting_Display.draw(screen, mode, running)
-        elif mode[0] == C.PLAYING:
+        elif mode[C.NEXT_SCREEN] == C.PLAYING:
             Draw_Playing_Display.draw(screen, mode, running)
-        elif mode[0] == C.STOP:
+        elif mode[C.NEXT_SCREEN] == C.STOP:
             Draw_Stop_Display.draw(screen, mode, running)
         else:
             pass

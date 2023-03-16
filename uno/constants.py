@@ -3,4 +3,7 @@
 START = 1
 SETTING = 2
 PLAYING = 3
-STOP = 4        
+STOP = 4  
+
+NEXT_SCREEN = 0
+PREV_SCREEN = 1

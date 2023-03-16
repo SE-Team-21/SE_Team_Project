@@ -26,11 +26,11 @@ def draw(screen, mode, running):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
                     if idx == 0:                            
-                        mode[0] = C.PLAYING
+                        mode[C.NEXT_SCREEN] = C.PLAYING
                     elif idx == 1:
-                        mode[0] = C.SETTING
-                        mode[1] = C.START
-                    elif idx==2:
+                        mode[C.NEXT_SCREEN] = C.SETTING
+                        mode[C.PREV_SCREEN] = C.START
+                    elif idx == 2:
                         running[0] = False
         else:
             if flag:
