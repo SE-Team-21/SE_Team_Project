@@ -1,5 +1,5 @@
-from Button_Class import Button
-from Text_Class import Text
+from uno.Button_Class import Button
+from uno.Text_Class import Text
 import pygame as pg
 
 Text_list = []

@@ -1,7 +1,7 @@
-from Button_Class import Button
-from Text_Class import Text
+from uno.Button_Class import Button
+from uno.Text_Class import Text
 import pygame as pg
-from Dataset import change_size
+from uno.Dataset import change_size
 
 Button_list = []
 Button_list.append(Button((400, 400), (200, 60), 'Back'))

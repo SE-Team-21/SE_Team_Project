@@ -1,8 +1,8 @@
 import pygame as pg
-import Draw_Start_Display
-import Draw_Setting_Display
-import Draw_Playing_Display
-import Draw_Stop_Display
+import uno.Draw_Start_Display as Draw_Start_Display
+import uno.Draw_Setting_Display as Draw_Setting_Display
+import uno.Draw_Playing_Display as Draw_Playing_Display
+import uno.Draw_Stop_Display as Draw_Stop_Display
 
 def pygame_mainloop():
     pg.init()
