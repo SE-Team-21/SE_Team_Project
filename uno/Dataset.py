@@ -1,6 +1,6 @@
-import Draw_Playing_Display
-import Draw_Start_Display
-import Draw_Stop_Display
+import uno.Draw_Playing_Display as Draw_Playing_Display
+import uno.Draw_Start_Display as Draw_Start_Display
+import uno.Draw_Stop_Display as Draw_Stop_Display
 
 def change_size(idx):    
     for item in Draw_Playing_Display.Text_list:

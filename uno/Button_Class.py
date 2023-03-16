@@ -1,5 +1,5 @@
 import pygame as pg
-from Color import *
+from uno.Color import *
 
 class Button:
     def __init__(self, pos, size, name, color = BLACK): # pos = 버튼 중앙 좌표, size = (가로, 세로), name = 내용

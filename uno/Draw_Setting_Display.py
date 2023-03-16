@@ -1,7 +1,8 @@
-from Button_Class import Button
-from Text_Class import Text
+from uno.Button_Class import Button
+from uno.Text_Class import Text
 import pygame as pg
-from Dataset import change_size
+from uno.Dataset import change_size
+import uno.constants as C
 
 Button_list = []
 Button_list.append(Button((400, 400), (200, 60), 'Back'))
@@ -32,10 +33,10 @@ def draw(screen, mode, running):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
                     if idx==0:
-                        if mode[1]==1:
-                            mode[0]=1
-                        elif mode[1]==4:
-                            mode[0]=4
+                        if mode[C.PREV_SCREEN] == C.START:
+                            mode[C.NEXT_SCREEN] = C.START
+                        elif mode[C.PREV_SCREEN] == C.STOP:
+                            mode[C.NEXT_SCREEN] = C.STOP
                     else:
                         screen = pg.display.set_mode(screen_size[idx-1])
                         for item in Button_list:

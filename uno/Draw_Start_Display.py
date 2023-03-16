@@ -1,14 +1,15 @@
-from Button_Class import Button
-from Text_Class import Text
+from uno.Button_Class import Button
+from uno.Text_Class import Text
 import pygame as pg
+import uno.constants as C
 
 Button_list = []
-Button_list.append(Button((400, 200), (100, 50), 'RESUME'))
+Button_list.append(Button((400, 200), (100, 50), 'SINGLE PLAYER'))
 Button_list.append(Button((400, 300), (100, 50), 'OPTIONS'))
-Button_list.append(Button((400, 400), (100, 50), 'GAME QUIT'))
+Button_list.append(Button((400, 400), (100, 50), 'QUIT'))
 
 Text_list = []
-Text_list.append(Text((320, 60), 40, 'PAUSE'))
+Text_list.append(Text((320, 60), 40, 'UNO Game'))
 
 def draw(screen, mode, running):
     for event in pg.event.get():
@@ -24,13 +25,13 @@ def draw(screen, mode, running):
             for idx, item in enumerate(Button_list):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
-                    if idx==0:
-                        mode[0]=3
-                    elif idx==1:
-                        mode[0]=2
-                        mode[1]=4
-                    elif idx==2:
-                        mode[0]=1
+                    if idx == 0:                            
+                        mode[C.NEXT_SCREEN] = C.PLAYING
+                    elif idx == 1:
+                        mode[C.NEXT_SCREEN] = C.SETTING
+                        mode[C.PREV_SCREEN] = C.START
+                    elif idx == 2:
+                        running[0] = False
         else:
             if flag:
                 for item in Button_list:
