@@ -35,6 +35,8 @@ def draw(screen, mode, running):
                     if idx==0:
                         if mode[C.PREV_SCREEN] == C.START:
                             mode[C.NEXT_SCREEN] = C.START
+                            C.mouse_focus=-1
+                            C.key_focus=-1
                         elif mode[C.PREV_SCREEN] == C.STOP:
                             mode[C.NEXT_SCREEN] = C.STOP
                     else:

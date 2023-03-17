@@ -8,11 +8,11 @@ class Text:
         self.pos = pos
         self.size = size
         self.color = color
-        self.content = text
+        self.text = text
         self.FONT = pg.font.SysFont('arial', 20)
-        self.text = self.FONT.render(text, True, color)
+        self.ren = self.FONT.render(text, True, color)
     def draw(self, screen):
-        screen.blit(self.text, self.pos)
+        screen.blit(self.ren, self.pos)
     def change_size(self, size):
         if size==1:
             self.FONT = pg.font.SysFont('arial', 20)
@@ -23,5 +23,4 @@ class Text:
         else:
             self.FONT = pg.font.SysFont('arial', int(20*1.2))
             self.pos = tuple(int(item*1.2) for item in self.default_pos)
-        self.text = self.FONT.render(self.content, True, self.color)
-        
+        self.ren = self.FONT.render(self.text, True, self.color)
