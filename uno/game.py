@@ -12,14 +12,6 @@ CARD_TYPES = NUMBERS + SPECIAL_CARD_TYPES + BLACK_CARD_TYPES
 
 
 class UnoCard:
-    """
-    Represents a single Uno Card, given a valid color and card type.
-
-    color: string
-    card_type: string/int
-
-    >>> card = UnoCard('red', 5)
-    """
     def __init__(self, color, card_type):
         self._validate(color, card_type)
         self.color = color
@@ -36,9 +28,6 @@ class UnoCard:
         return self.color == other.color and self.card_type == other.card_type
 
     def _validate(self, color, card_type):
-        """
-        Check the card is valid, raise exception if not.
-        """
         if color not in ALL_COLORS:
             raise ValueError('Invalid color')
         if color == 'black' and card_type not in BLACK_CARD_TYPES:
@@ -73,10 +62,6 @@ class UnoCard:
         self._temp_color = color
 
     def playable(self, other):
-        """
-        Return True if the other card is playable on top of this card,
-        otherwise return False
-        """
         return (
             self._color == other.color or
             self.card_type == other.card_type or
@@ -85,16 +70,6 @@ class UnoCard:
 
 
 class UnoPlayer:
-    """
-    Represents a player in an Uno game. A player is created with a list of 7
-    Uno cards.
-
-    cards: list of 7 UnoCards
-    player_id: int/str (default: None)
-
-    >>> cards = [UnoCard('red', n) for n in range(7)]
-    >>> player = UnoPlayer(cards)
-    """
     def __init__(self, cards, player_id=None):
         if len(cards) != 7:
             raise ValueError(
@@ -120,22 +95,10 @@ class UnoPlayer:
             return repr(self)
 
     def can_play(self, current_card):
-        """
-        Return True if the player has any playable cards (on top of the current
-        card provided), otherwise return False
-        """
         return any(current_card.playable(card) for card in self.hand)
 
 
 class UnoGame:
-    """
-    Represents an Uno game.
-
-    players: int
-    random: bool (default: True)
-
-    >>> game = UnoGame(5)
-    """
     def __init__(self, players, random=True):
         if not isinstance(players, int):
             raise ValueError('Invalid game: players must be integer')
@@ -150,16 +113,9 @@ class UnoGame:
         self._winner = None
 
     def __next__(self):
-        """
-        Iteration sets the current player to the next player in the cycle.
-        """
         self._current_player = next(self._player_cycle)
 
     def _create_deck(self, random):
-        """
-        Return a list of the complete set of Uno Cards. If random is True, the
-        deck will be shuffled, otherwise will be unshuffled.
-        """
         color_cards = product(COLORS, COLOR_CARD_TYPES)
         black_cards = product(repeat('black', 4), BLACK_CARD_TYPES)
         all_cards = chain(color_cards, black_cards)
@@ -171,10 +127,6 @@ class UnoGame:
             return list(reversed(deck))
 
     def _deal_hand(self):
-        """
-        Return a list of 7 cards from the top of the deck, and remove these
-        from the deck.
-        """
         return [self.deck.pop() for i in range(7)]
 
     @property
@@ -194,17 +146,6 @@ class UnoGame:
         return self._winner
 
     def play(self, player, card=None, new_color=None):
-        """
-        Process the player playing a card.
-
-        player: int representing player index number
-        card: int representing index number of card in player's hand
-
-        It must be player's turn, and if card is given, it must be playable.
-        If card is not given (None), the player picks up a card from the deck.
-
-        If game is over, raise an exception.
-        """
         if not isinstance(player, int):
             raise ValueError('Invalid player: should be the index number')
         if not 0 <= player < len(self.players):
@@ -256,9 +197,6 @@ class UnoGame:
             self._print_winner()
 
     def _print_winner(self):
-        """
-        Print the winner name if available, otherwise look up the index number.
-        """
         if self.winner.player_id:
             winner_name = self.winner.player_id
         else:
@@ -266,38 +204,11 @@ class UnoGame:
         print("Player {} wins!".format(winner_name))
 
     def _pick_up(self, player, n):
-        """
-        Take n cards from the bottom of the deck and add it to the player's
-        hand.
-
-        player: UnoPlayer
-        n: int
-        """
         penalty_cards = [self.deck.pop(0) for i in range(n)]
         player.hand.extend(penalty_cards)
 
 
 class ReversibleCycle:
-    """
-    Represents an interface to an iterable which can be infinitely cycled (like
-    itertools.cycle), and can be reversed.
-
-    Starts at the first item (index 0), unless reversed before first iteration,
-    in which case starts at the last item.
-
-    iterable: any finite iterable
-
-    >>> rc = ReversibleCycle(range(3))
-    >>> next(rc)
-    0
-    >>> next(rc)
-    1
-    >>> rc.reverse()
-    >>> next(rc)
-    0
-    >>> next(rc)
-    2
-    """
     def __init__(self, iterable):
         self._items = list(iterable)
         self._pos = None
