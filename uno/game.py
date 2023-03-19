@@ -276,3 +276,113 @@ class UnoGame:
         penalty_cards = [self.deck.pop(0) for i in range(n)]
         player.hand.extend(penalty_cards)
 
+
+class ReversibleCycle:
+    """
+    Represents an interface to an iterable which can be infinitely cycled (like
+    itertools.cycle), and can be reversed.
+
+    Starts at the first item (index 0), unless reversed before first iteration,
+    in which case starts at the last item.
+
+    iterable: any finite iterable
+
+    >>> rc = ReversibleCycle(range(3))
+    >>> next(rc)
+    0
+    >>> next(rc)
+    1
+    >>> rc.reverse()
+    >>> next(rc)
+    0
+    >>> next(rc)
+    2
+    """
+    def __init__(self, iterable):
+        self._items = list(iterable)
+        self._pos = None
+        self._reverse = False
+
+    def __next__(self):
+        if self.pos is None:
+            self.pos = -1 if self._reverse else 0
+        else:
+            self.pos = self.pos + self._delta
+        return self._items[self.pos]
+
+    @property
+    def _delta(self):
+        return -1 if self._reverse else 1
+
+    @property
+    def pos(self):
+        return self._pos
+
+    @pos.setter
+    def pos(self, value):
+        self._pos = value % len(self._items)
+
+    def reverse(self):
+        """
+        Reverse the order of the iterable.
+        """
+        self._reverse = not self._reverse
+
+
+class AIUnoGame:
+    def __init__(self, players):
+        self.game = UnoGame(players)
+        self.player = choice(self.game.players)
+        self.player_index = self.game.players.index(self.player)
+        print('The game begins. You are Player {}.'.format(self.player_index))
+        self.print_hand()
+        while self.game.is_active:
+            print()
+            next(self)
+
+    def __next__(self):
+        game = self.game
+        player = game.current_player
+        player_id = player.player_id
+        current_card = game.current_card
+        if player == self.player:
+            print('Current card: {}, color: {}'.format(
+                game.current_card, game.current_card._color
+            ))
+            self.print_hand()
+            if player.can_play(current_card):
+                played = False
+                while not played:
+                    card_index = int(input('Which card do you want to play? '))
+                    card = player.hand[card_index]
+                    if not game.current_card.playable(card):
+                        print('Cannot play that card')
+                    else:
+                        if card.color == 'black':
+                            new_color = input('Which color do you want? ')
+                        else:
+                            new_color = None
+                        game.play(player_id, card_index, new_color)
+                        played = True
+            else:
+                print('You cannot play. You must pick up a card.')
+                game.play(player_id, card=None)
+                self.print_hand()
+        elif player.can_play(game.current_card):
+            for i, card in enumerate(player.hand):
+                if game.current_card.playable(card):
+                    if card.color == 'black':
+                        new_color = choice(COLORS)
+                    else:
+                        new_color = None
+                    print("Player {} played {}".format(player, card))
+                    game.play(player=player_id, card=i, new_color=new_color)
+                    break
+        else:
+            print("Player {} picked up".format(player))
+            game.play(player=player_id, card=None)
+
+    def print_hand(self):
+        print('Your hand: {}'.format(
+            ' '.join(str(card) for card in self.player.hand)
+        ))
