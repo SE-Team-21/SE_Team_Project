@@ -11,6 +11,13 @@ Button_list.append(Button((400, 400), (100, 50), 'GAME QUIT'))
 Text_list = []
 Text_list.append(Text((320, 60), 40, 'PAUSE'))
 
+def update_screen(screen):
+    screen.fill((255, 255, 255))
+    for item in Button_list:
+        item.draw(screen)
+    for item in Text_list:
+        item.draw(screen)
+    
 def draw(screen, mode, running):
     for event in pg.event.get():
         mouse_pos = pg.mouse.get_pos()
@@ -21,6 +28,7 @@ def draw(screen, mode, running):
                 flag = False
         if event.type == pg.QUIT:
             running[0] = False
+            return
         elif event.type == pg.MOUSEBUTTONDOWN:
             for idx, item in enumerate(Button_list):
                 if item.rect.collidepoint(mouse_pos):
@@ -36,8 +44,4 @@ def draw(screen, mode, running):
             if flag:
                 for item in Button_list:
                     item.inactive()
-    screen.fill((255, 255, 255))
-    for item in Button_list:
-        item.draw(screen)
-    for item in Text_list:
-        item.draw(screen)
+    update_screen(screen)
