@@ -5,6 +5,28 @@ import uno.Draw_Playing_Display as Draw_Playing_Display
 import uno.Draw_Stop_Display as Draw_Stop_Display
 import uno.constants as C
 
+# from uno.Game import UnoGame, COLORS
+# import random
+
+# game = UnoGame(5, False)
+
+# while game.is_active:
+#     player = game.current_player
+#     player_id = player.player_id
+#     if player.can_play(game.current_card):
+#         for i, card in enumerate(player.hand):
+#             if game.current_card.playable(card):
+#                 if card.color == 'black':
+#                     new_color = random.choice(COLORS)
+#                 else:
+#                     new_color = None
+#                 print("Player {} played {}".format(player, card))
+#                 game.play(player=player_id, card=i, new_color=new_color)
+#                 break
+#     else:
+#         print("Player {} picked up".format(player))
+#         game.play(player=player_id, card=None)
+
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game")
@@ -30,3 +52,6 @@ def uno_mainloop():
 
 if __name__ == "__main__":
     uno_mainloop()
+
+
+
