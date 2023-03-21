@@ -1,7 +1,7 @@
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
-import uno.constants as C
+import uno.Constants as C
 
 Button_list = []
 Button_list.append(Button((400, 200), (100, 50), 'RESUME'))

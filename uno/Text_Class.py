@@ -1,6 +1,6 @@
 import pygame as pg
-import uno.Color as COLOR
-import uno.constants as C
+import uno.Constants as COLOR
+import uno.Constants as C
 
 class Text:
     def __init__(self, pos, size, text, color = COLOR.BLACK): # pos = 좌상단 모서리 좌표, size = 글씨 크기, text = 내용

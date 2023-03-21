@@ -1,14 +1,6 @@
 from random import shuffle, choice
 from itertools import product, repeat, chain
-
-
-COLORS = ['red', 'yellow', 'green', 'blue']
-ALL_COLORS = COLORS + ['black']
-NUMBERS = list(range(10)) + list(range(1, 10))
-SPECIAL_CARD_TYPES = ['skip', 'reverse', '+2']
-COLOR_CARD_TYPES = NUMBERS + SPECIAL_CARD_TYPES * 2
-BLACK_CARD_TYPES = ['wildcard', '+4']
-CARD_TYPES = NUMBERS + SPECIAL_CARD_TYPES + BLACK_CARD_TYPES
+from uno.Constants import COLORS, ALL_COLORS, COLOR_CARD_TYPES, BLACK_CARD_TYPES, ARBITRARY_BLACK_CARD_TYPES, ARBITRARY_COLOR_CARD_TYPES, CARD_TYPES
 
 
 class UnoCard:
@@ -30,9 +22,11 @@ class UnoCard:
     def _validate(self, color, card_type):
         if color not in ALL_COLORS:
             raise ValueError('Invalid color')
-        if color == 'black' and card_type not in BLACK_CARD_TYPES:
+        if color == 'black' and not (card_type in BLACK_CARD_TYPES 
+                                 or card_type in ARBITRARY_BLACK_CARD_TYPES):
             raise ValueError('Invalid card type')
-        if color != 'black' and card_type not in COLOR_CARD_TYPES:
+        if color != 'black' and not (card_type in COLOR_CARD_TYPES 
+                                 or card_type in ARBITRARY_COLOR_CARD_TYPES):
             raise ValueError('Invalid card type')
 
     @property
@@ -118,8 +112,12 @@ class UnoGame:
     def _create_deck(self, random):
         color_cards = product(COLORS, COLOR_CARD_TYPES)
         black_cards = product(repeat('black', 4), BLACK_CARD_TYPES)
-        all_cards = chain(color_cards, black_cards)
+        # 임의
+        Arbitrary_cards = chain(product(repeat('black', 2), ARBITRARY_BLACK_CARD_TYPES),
+                                product(COLORS, ARBITRARY_COLOR_CARD_TYPES))
+        all_cards = chain(color_cards, black_cards, Arbitrary_cards)
         deck = [UnoCard(color, card_type) for color, card_type in all_cards]
+        print(deck)
         if random:
             shuffle(deck)
             return deck

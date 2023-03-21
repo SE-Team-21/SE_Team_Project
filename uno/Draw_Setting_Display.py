@@ -2,7 +2,7 @@ from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
 from uno.Dataset import change_size
-import uno.constants as C
+import uno.Constants as C
 
 Button_list = []
 Button_list.append(Button((200, 160), (100, 60), '800x600'))
