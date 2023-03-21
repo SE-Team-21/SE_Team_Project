@@ -1,7 +1,7 @@
 from uno.game.Card import UnoCard
 from uno.game.Player import UnoPlayer
 from uno.game.ReversibleCycle import ReversibleCycle
-from random import shuffle
+from random import shuffle, random
 from itertools import product, repeat, chain
 from uno.Constants import COLORS, COLOR_CARD_TYPES, BLACK_CARD_TYPES, ARBITRARY_BLACK_CARD_TYPES, ARBITRARY_COLOR_CARD_TYPES
 
@@ -95,13 +95,18 @@ class UnoGame:
                 next(self)
                 self._pick_up(self.current_player, 4)
             if card_type == 'wildcard_fuck':
+                if random() < 0.1:
+                    _player.hand.clear()
                 next(self)
-                self._pick_up(self.current_player, 4)
             if card_type == 'wildcard+10':
                 next(self)
                 self._pick_up(self.current_player, 10)
         elif card_type == 'all+1':
-            self._pick_up(self.current_player, 1)
+            player_now = self.current_player
+            for n in self.players:
+                next(self)
+                if(player_now != self.current_player):
+                    self._pick_up(self.current_player, 1)
         elif card_type == 'reverse':
             self._player_cycle.reverse()
         elif card_type == 'skip':
