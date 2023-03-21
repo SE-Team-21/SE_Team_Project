@@ -37,3 +37,8 @@ class Button:
         self.text = self.FONT.render(self.button_text, True, self.text_color)
         self.text_rect = self.text.get_rect(center=self.pos)
         self.rect.center = self.pos
+        
+    def change_text(self, text):
+        self.button_text=text
+        self.text = self.FONT.render(text, True, COLOR.BLACK)
+        self.text_rect = self.text.get_rect(center=self.pos)
