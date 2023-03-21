@@ -13,7 +13,14 @@ Text_list.append(Text((320, 60), 40, 'UNO Game'))
 
 KEY = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_KP_ENTER]
 
-def screen_change(idx, mode, running): # idx = 어떤 버튼인지
+def update_screen(screen):
+    screen.fill((255, 255, 255))
+    for item in Button_list:
+        item.draw(screen)
+    for item in Text_list:
+        item.draw(screen)
+
+def screen_change(idx, mode, running):
     if idx == 0:                            
         mode[C.NEXT_SCREEN] = C.PLAYING
     elif idx == 1:
@@ -26,7 +33,7 @@ def on_draw(index):
     for idx, item in enumerate(Button_list):
         if idx==index:
             item.above()
-        else:
+        else:   
             item.inactive()
             
 def on_button(pos):
@@ -74,8 +81,7 @@ def draw(screen, mode, running):
             on_draw(C.key_focus)
         else:
             on_draw(C.mouse_focus)
-    screen.fill((255, 255, 255))
-    for item in Button_list:
-        item.draw(screen)
-    for item in Text_list:
-        item.draw(screen)
+    update_screen(screen)
+                    
+                    
+            

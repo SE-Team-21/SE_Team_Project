@@ -5,10 +5,10 @@ from uno.Dataset import change_size
 import uno.constants as C
 
 Button_list = []
-Button_list.append(Button((400, 400), (200, 60), 'Back'))
 Button_list.append(Button((200, 160), (100, 60), '800x600'))
 Button_list.append(Button((400, 160), (100, 60), '880x660'))
 Button_list.append(Button((600, 160), (100, 60), '960x720'))
+Button_list.append(Button((400, 400), (200, 60), 'Back'))
 
 Text_list = []
 Text_list.append(Text((320, 60), 40, 'Display'))
@@ -28,19 +28,18 @@ def draw(screen, mode, running):
                 flag = False
         if event.type == pg.QUIT:
             running[0] = False
+            return
         elif event.type == pg.MOUSEBUTTONDOWN:
             for idx, item in enumerate(Button_list):
                 if item.rect.collidepoint(mouse_pos):
                     item.active()
-                    if idx==0:
+                    if idx==3:
                         if mode[C.PREV_SCREEN] == C.START:
                             mode[C.NEXT_SCREEN] = C.START
-                            C.mouse_focus=-1
-                            C.key_focus=-1
                         elif mode[C.PREV_SCREEN] == C.STOP:
                             mode[C.NEXT_SCREEN] = C.STOP
                     else:
-                        screen = pg.display.set_mode(screen_size[idx-1])
+                        screen = pg.display.set_mode(screen_size[idx])
                         for item in Button_list:
                             item.change_size(idx)
                         for item in Text_list:

@@ -5,15 +5,14 @@ import uno.Draw_Playing_Display as Draw_Playing_Display
 import uno.Draw_Stop_Display as Draw_Stop_Display
 import uno.constants as C
 
-
-
 def uno_mainloop():
     pg.init()
-    pg.display.set_caption("UNO Game") # 실행 창 제목
+    pg.display.set_caption("UNO Game")
     screen = pg.display.set_mode((800,600))
-    
     running = [True]
     mode = [C.START, C.START] # mode[0] = 다음 화면, mode[1] = 이전 화면
+
+    
     while running[0]:
         if mode[C.NEXT_SCREEN] == C.START:
             Draw_Start_Display.draw(screen, mode, running)
@@ -26,6 +25,7 @@ def uno_mainloop():
         else:
             pass
         pg.display.update()
+        pg.time.wait(100)
     pg.quit()
 
 if __name__ == "__main__":
