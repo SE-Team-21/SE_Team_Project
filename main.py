@@ -9,7 +9,7 @@ import uno.KeySettings as K
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
-    screen = pg.display.set_mode((800,600))
+    screen = pg.display.set_mode((1980,1080))
     K.load_settings()
     for idx in range(5): # load 해온 값으로 설정 창에 있는 버튼 다시 그려주기
         Draw_Setting_Display.Button_list[idx+4].change_text(pg.key.name(K.KEY_Settings[idx])) #Draw_Setting에 있는 Button의 index가 4~8이라서 idx+4해줌
