@@ -2,6 +2,7 @@ from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
 import uno.Constants as C
+import uno.KeySettings as K
 
 Button_list = []
 Button_list.append(Button((400, 200), (100, 50), 'SINGLE PLAYER'))
@@ -10,8 +11,6 @@ Button_list.append(Button((400, 400), (100, 50), 'QUIT'))
 
 Text_list = []
 Text_list.append(Text((320, 60), 40, 'UNO Game'))
-
-KEY = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_KP_ENTER]
 
 def update_screen(screen):
     screen.fill((255, 255, 255))
@@ -59,7 +58,7 @@ def draw(screen, mode, running):
             for item in Button_list:
                 C.mouse_focus = -1
         if event.type == pg.KEYUP and C.mouse_focus == -1: # 키보드를 눌렀는가?
-            for idx, item in enumerate(KEY):
+            for idx, item in enumerate(K.KEY_Settings):
                 if event.key == item:
                     if idx==0 or idx==1:
                         if C.POS==0:
@@ -82,6 +81,3 @@ def draw(screen, mode, running):
         else:
             on_draw(C.mouse_focus)
     update_screen(screen)
-                    
-                    
-            
