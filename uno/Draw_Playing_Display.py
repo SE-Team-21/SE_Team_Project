@@ -1,7 +1,7 @@
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import pygame as pg
-import uno.constants as C
+import uno.Constants as C
 
 Text_list = []
 Text_list.append(Text((220, 60), 40, 'Playing Display'))
