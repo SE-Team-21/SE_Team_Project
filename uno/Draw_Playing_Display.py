@@ -12,7 +12,7 @@ def draw(screen, mode, running):
     t.game_start()
     x = 60
     y = 60
-    Text_list.clear()
+    Button_list.clear()
     for idx, player in enumerate(t.game.players):
         Text_list.append(Text((x, y), 20, 'Player : '+str(idx)))
         x+=220
