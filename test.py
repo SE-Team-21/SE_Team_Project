@@ -1,4 +1,9 @@
-from uno.Game import UnoGame, COLORS
+from uno.game.AI import AIUnoGame
+from uno.game.Card import UnoCard
+from uno.game.Game import UnoGame
+from uno.game.Player import UnoPlayer
+from uno.game.ReversibleCycle import ReversibleCycle
+from uno.Constants import COLORS
 import random
 
 game = UnoGame(5)
