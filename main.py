@@ -16,13 +16,13 @@ def uno_mainloop():
         b.Button_list[idx+4].change_text(pg.key.name(K.KEY_Settings[idx])) #Draw_Setting에 있는 Button의 index가 4~8이라서 idx+4해줌
     running = [True]
     while running[0]:
-        if D.mode[C.NEXT_SCREEN] == C.START:
+        if D.Display.mode[C.NEXT_SCREEN] == C.START:
             a.main_loop(running)
-        elif D.mode[C.NEXT_SCREEN] == C.SETTING:
+        elif D.Display.mode[C.NEXT_SCREEN] == C.SETTING:
             b.main_loop(running)
-        elif D.mode[C.NEXT_SCREEN] == C.PLAYING:
+        elif D.Display.mode[C.NEXT_SCREEN] == C.PLAYING:
             c.main_loop(running)
-        elif D.mode[C.NEXT_SCREEN] == C.STOP:
+        elif D.Display.mode[C.NEXT_SCREEN] == C.STOP:
             d.main_loop(running)
         else:
             pass
