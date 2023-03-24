@@ -2,7 +2,6 @@ import pygame as pg
 from pygame.locals import *
 import os
 
-# Constants for display and colorblind mode
 COLORBLIND_MODE = False
 COLORBLIND_COLORS = {
     'red': (255, 100, 100),
@@ -27,10 +26,8 @@ class Display:
         self.colorblind_mode = colorblind_mode
 
     def draw_card(self, card, x, y):
-        # Load card image
         card_image = pg.image.load(os.path.join('assets', f'{card}.png'))
         
-        # Draw card on screen
         self.screen.blit(card_image, (x, y))
 
     def get_color(self, color_name):
@@ -50,18 +47,13 @@ class Display:
             for event in pg.event.get():
                 if event.type == QUIT:
                     running = False
-                # Handle other events here (e.g., mouse clicks, key presses)
-
-            # Draw cards and other game elements using game_logic
-            # Example: self.draw_card(game_logic.card, x, y)
 
             self.update_display()
             self.clock.tick(60)
 
         pg.quit()
 
-# Initialize the display
 display = Display(800, 600, 'Uno Game', colorblind_mode=COLORBLIND_MODE)
 
-# Run the main loop with your game logic
-# Example: display.main_loop(your_game_logic_instance)
+
+#이런식으로 대충
