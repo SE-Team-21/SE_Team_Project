@@ -10,7 +10,6 @@ def save_settings(idx, key):
         pickle.dump(KEY_Settings, f)
     with open("data.pickle","rb") as fr:
         KEY_Settings = pickle.load(fr)
-    print(KEY_Settings)
 
 def load_settings():
     global KEY_Settings
@@ -27,5 +26,3 @@ def load_settings():
         KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_KP_ENTER]
         with open("data.pickle", "wb") as fw:
             pickle.dump(KEY_Settings, fw)
-        
-        
