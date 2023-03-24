@@ -55,5 +55,4 @@ class Display:
 
 display = Display(800, 600, 'Uno Game', colorblind_mode=COLORBLIND_MODE)
 
-
 #이런식으로 대충
