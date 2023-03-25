@@ -11,8 +11,6 @@ def uno_mainloop():
     b = D.Setting()
     c = D.Playing()
     d = D.Pause()
-    for idx in range(6): # load 해온 값으로 설정 창에 있는 버튼 다시 그려주기
-        b.Button_list[idx+4].change_text(pg.key.name(K.KEY_Settings[idx])) #Draw_Setting에 있는 Button의 index가 4~9이라서 idx+4해줌
     running = [True]
     while running[0]:
         if D.Display.mode[C.NEXT_SCREEN] == C.START:
