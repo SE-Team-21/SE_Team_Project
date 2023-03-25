@@ -6,7 +6,6 @@ import uno.KeySettings as K
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
-    screen = pg.display.set_mode((800,600))
     K.load_settings()
     a = D.Start()
     b = D.Setting()
@@ -24,8 +23,6 @@ def uno_mainloop():
             c.main_loop(running)
         elif D.Display.mode[C.NEXT_SCREEN] == C.STOP:
             d.main_loop(running)
-        else:
-            pass
     pg.quit()
 
 if __name__ == "__main__":
