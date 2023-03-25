@@ -27,10 +27,10 @@ class Display(metaclass=ABCMeta):
     mode = [C.START, C.START]
     display_idx = 0
 
-    def __init__(self, width = 800, height = 600, colorblind_mode = False):
+    def __init__(self, colorblind_mode = False):
         self.Button_list = []
         self.Text_list = []
-        self.screen = pg.display.set_mode((width, height))
+        self.screen = pg.display.set_mode(C.DISPLAY_SIZE[Display.display_idx])
         self.colorblind_mode = colorblind_mode
 
     def draw_card(self, card, x, y):
@@ -43,13 +43,19 @@ class Display(metaclass=ABCMeta):
         else:
             return REGULAR_COLORS.get(color_name, (255, 255, 255))
 
+    def update_screen(self, mouse_pos): # 현재 화면 업데이트
+        self.screen.fill((255, 255, 255))
+        for item in self.Button_list:
+            item.change_size(self.display_idx)
+            item.update(mouse_pos)
+            item.draw(self.screen)
+        for item in self.Text_list:
+            item.change_size(self.display_idx)
+            item.draw(self.screen)
+        pg.display.update()
 
     @abstractmethod
-    def update_screen(self):
-        pass
-
-    @abstractmethod
-    def next_screen(self):
+    def next_screen(self): # 버튼 클릭시 다음 화면으로 전환
         pass
 
     @abstractmethod
@@ -73,17 +79,6 @@ class Start(Display):
         elif idx == 2:
             running[0] = False
 
-    def update_screen(self, mouse_pos):
-        self.screen.fill((255, 255, 255))
-        for item in self.Button_list:
-            item.update(mouse_pos)
-            item.change_size(self.display_idx)
-            item.draw(self.screen)
-        for item in self.Text_list:
-            item.change_size(self.display_idx)
-            item.draw(self.screen)
-        pg.display.update()
-
     def main_loop(self, running):
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
@@ -94,6 +89,8 @@ class Start(Display):
                 for idx, item in enumerate(self.Button_list):
                     if item.above:
                         item.click((idx, running))
+            elif event.type == pg.KEYUP:
+                pass
 
 class Setting(Display):
     def __init__(self):
@@ -107,7 +104,7 @@ class Setting(Display):
         self.Button_list.append(Button((380, 320), (100, 60), 'RIGHT', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((530, 320), (100, 60), 'LEFT', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((680, 320), (100, 60), 'ENTER', lambda idx, running: self.button_setting(idx, running)))
-        self.Text_list.append(Text((320, 60), 40, 'Display'))
+        self.Text_list.append(Text((320, 60), 40, 'Resolution'))
         self.Text_list.append(Text((320, 200), 40, 'Key Setting'))
         self.Text_list.append(Text((320, 500), 40, 'color mode'))
         self.Text_list.append(Text((320, 550), 40, 'Default Options'))
@@ -118,15 +115,6 @@ class Setting(Display):
         self.Text_list.append(Text((650, 260), 40, 'Enter'))
         self.key_set = False
         self.index = 0
-    
-    def update_screen(self, mouse_pos):
-        self.screen.fill((255, 255, 255))
-        for item in self.Button_list:
-            item.update(mouse_pos)
-            item.draw(self.screen)
-        for item in self.Text_list:
-            item.draw(self.screen)
-        pg.display.update()
 
     def next_screen(self, not_use, running):
         if self.mode[C.PREV_SCREEN] == C.START:
@@ -142,10 +130,6 @@ class Setting(Display):
     def screen_size_change(self, idx, not_use):
         Display.display_idx = idx
         self.screen = pg.display.set_mode(C.DISPLAY_SIZE[self.display_idx])
-        for item in self.Button_list:
-            item.change_size(self.display_idx)
-        for item in self.Text_list:
-            item.change_size(self.display_idx)
         self.key_set = False
 
     def main_loop(self, running):
@@ -174,17 +158,6 @@ class Playing(Display):
         self.Text_list.append(Text((220, 60), 40, 'Playing Display'))
         self.Text_list.append(Text((220, 120), 40, 'Press ESC to PAUSE Menu'))
 
-    def update_screen(self, mouse_pos):
-        self.screen.fill((255, 255, 255))
-        for item in self.Button_list:
-            item.change_size(self.display_idx)
-            item.update(mouse_pos)
-            item.draw(self.screen)
-        for item in self.Text_list:
-            item.change_size(self.display_idx)
-            item.draw(self.screen)
-        pg.display.update()
-
     def next_screen(self):
         pass
 
@@ -204,18 +177,6 @@ class Pause(Display):
         self.Button_list.append(Button((400, 200), (100, 50), 'RESUME', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((400, 300), (100, 50), 'OPTIONS', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((400, 400), (100, 50), 'GAME QUIT', lambda x,y: self.next_screen(x,y)))
-        pass
-
-    def update_screen(self, mouse_pos):
-        self.screen.fill((255, 255, 255))
-        for item in self.Button_list:
-            item.change_size(self.display_idx)
-            item.update(mouse_pos)
-            item.draw(self.screen)
-        for item in self.Text_list:
-            item.change_size(self.display_idx)
-            item.draw(self.screen)
-        pg.display.update()
 
     def next_screen(self, idx, running):
         if idx==0:
