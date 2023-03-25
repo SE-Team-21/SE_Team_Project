@@ -149,7 +149,9 @@ class Setting(Display):
         self.Text_list.append(Text((667, 230), 40, 'ESCAPE'))
         self.key_set = False
         self.index = 0
-
+        for i in range(6):
+            self.Button_list[i+4].change_text(pg.key.name(K.KEY_Settings[i]))
+        
     def next_screen(self, not_use, running):
         if self.mode[C.PREV_SCREEN] == C.START:
             self.mode[C.NEXT_SCREEN] = C.START
@@ -191,9 +193,16 @@ class Setting(Display):
                             self.key_set = False
             if(self.key_set):
                 if event.type == pg.KEYUP:
-                    self.Button_list[self.index].change_text(pg.key.name(event.key))
-                    K.save_settings(self.index-4, event.key)
-                    self.key_set = False
+                    if event.key not in K.KEY_Settings:
+                        self.Button_list[self.index].change_text(pg.key.name(event.key))
+                        K.save_settings(self.index-4, event.key)
+                        self.key_set = False
+                    else:
+                        warning = Button((400, 300), (300, 60), 'The key is already in use', color=C.RED)
+                        warning.draw(self.screen)
+                        pg.display.update()
+                        pg.time.wait(1500)
+
 
 class Playing(Display):
     def __init__(self):
