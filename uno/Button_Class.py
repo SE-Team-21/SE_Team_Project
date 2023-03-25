@@ -17,6 +17,7 @@ class Button:
         self.color = C.INACTIVE_COLOR
         self.function = function
         self.above = False
+        self.on_key = False
     
     def update(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
@@ -25,7 +26,7 @@ class Button:
             self.above = False
 
     def draw(self, screen):
-        if self.above:
+        if self.above or self.on_key:
             self.color = C.ABOVE_COLOR
         else:
             self.color = C.INACTIVE_COLOR

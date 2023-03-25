@@ -26,6 +26,7 @@ class Display(metaclass=ABCMeta):
     # Static Variable
     mode = [C.START, C.START]
     display_idx = 0
+    key_idx = -1
 
     def __init__(self, colorblind_mode = False):
         self.Button_list = []
@@ -44,13 +45,12 @@ class Display(metaclass=ABCMeta):
             return REGULAR_COLORS.get(color_name, (255, 255, 255))
 
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
-        self.screen.fill((255, 255, 255))
         for item in self.Button_list:
-            item.change_size(self.display_idx)
+            item.change_size(Display.display_idx)
             item.update(mouse_pos)
             item.draw(self.screen)
         for item in self.Text_list:
-            item.change_size(self.display_idx)
+            item.change_size(Display.display_idx)
             item.draw(self.screen)
         pg.display.update()
 
@@ -65,10 +65,10 @@ class Display(metaclass=ABCMeta):
 class Start(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((400, 200), (100, 50), 'SINGLE PLAYER', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((400, 300), (100, 50), 'OPTIONS', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((400, 400), (100, 50), 'QUIT', lambda x,y: self.next_screen(x,y)))
-        self.Text_list.append(Text((320, 60), 40, 'UNO Game'))
+        self.Button_list.append(Button((100, 150), (120, 60), 'Play', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 300), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 450), (120, 60), 'Quit', lambda x,y: self.next_screen(x,y)))
+        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
 
     def next_screen(self, idx, running):
         if idx == 0:                            
@@ -78,41 +78,75 @@ class Start(Display):
             self.mode[C.PREV_SCREEN] = C.START
         elif idx == 2:
             running[0] = False
-
+    
     def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
+        self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
+        self.screen.blit(self.backgroundimg, (0, 0))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running[0] = False
                 return
             elif event.type == pg.MOUSEBUTTONDOWN:
+                self.Button_list[Display.key_idx].on_key = False
+                Display.key_idx = -1
                 for idx, item in enumerate(self.Button_list):
                     if item.above:
                         item.click((idx, running))
             elif event.type == pg.KEYUP:
-                pass
+                for idx, item in enumerate(K.KEY_Settings):
+                    if event.key == item:
+                        if idx == 0 or idx == 1: # Up and Left Key
+                            if Display.key_idx == 0:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx = len(self.Button_list)-1
+                            elif Display.key_idx == -1:
+                                Display.key_idx = 0
+                            else:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx -= 1
+                            self.Button_list[Display.key_idx].on_key = True
+                        elif idx == 2 or idx == 3: # Right and Down Key
+                            if Display.key_idx == len(self.Button_list)-1:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx = 0
+                            elif Display.key_idx == -1:
+                                Display.key_idx = 0
+                            else:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx += 1
+                            self.Button_list[Display.key_idx].on_key = True
+                        elif idx == 4: # Return Key
+                            if Display.key_idx != -1:
+                                self.Button_list[Display.key_idx].on_key = False
+                                self.next_screen(Display.key_idx, running)
+                                Display.key_idx = -1
 
 class Setting(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((200, 160), (100, 60), '800x600', lambda idx, running: self.screen_size_change(idx, running)))
-        self.Button_list.append(Button((400, 160), (100, 60), '880x660', lambda idx, running: self.screen_size_change(idx, running)))
-        self.Button_list.append(Button((600, 160), (100, 60), '960x720', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((200, 120), (100, 60), '800x600', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((400, 120), (100, 60), '880x660', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((600, 120), (100, 60), '960x720', lambda idx, running: self.screen_size_change(idx, running)))
         self.Button_list.append(Button((400, 550), (200, 60), 'Back', lambda idx, running: self.next_screen(idx, running)))
-        self.Button_list.append(Button((80, 320), (100, 60), 'UP', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((230, 320), (100, 60), 'DOWN', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((380, 320), (100, 60), 'RIGHT', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((530, 320), (100, 60), 'LEFT', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((680, 320), (100, 60), 'ENTER', lambda idx, running: self.button_setting(idx, running)))
-        self.Text_list.append(Text((320, 60), 40, 'Resolution'))
-        self.Text_list.append(Text((320, 200), 40, 'Key Setting'))
-        self.Text_list.append(Text((320, 500), 40, 'color mode'))
-        self.Text_list.append(Text((320, 550), 40, 'Default Options'))
-        self.Text_list.append(Text((50, 260), 40, 'UP'))
-        self.Text_list.append(Text((200, 260), 40, 'LEFT'))
-        self.Text_list.append(Text((350, 260), 40, 'DOWN'))
-        self.Text_list.append(Text((500, 260), 40, 'RIGHT'))
-        self.Text_list.append(Text((650, 260), 40, 'Enter'))
+        self.Button_list.append(Button((95, 290), (110, 60), 'UP', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((217, 290), (110, 60), 'DOWN', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((339, 290), (110, 60), 'RIGHT', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((461, 290), (110, 60), 'LEFT', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((583, 290), (110, 60), 'RETURN', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((705, 290), (110, 60), 'ESCAPE', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((400, 400), (80, 40), 'OFF'))
+        self.Button_list.append(Button((400, 470), (140, 60), 'Default Options'))
+        self.Text_list.append(Text((353, 40), 40, 'Resolution'))
+        self.Text_list.append(Text((349, 180), 40, 'Key Setting'))
+        self.Text_list.append(Text((331, 350), 40, 'Colorblind Mode'))
+        self.Text_list.append(Text((83, 230), 40, 'UP'))
+        self.Text_list.append(Text((194, 230), 40, 'LEFT'))
+        self.Text_list.append(Text((307, 230), 40, 'DOWN'))
+        self.Text_list.append(Text((430, 230), 40, 'RIGHT'))
+        self.Text_list.append(Text((541, 230), 40, 'RETURN'))
+        self.Text_list.append(Text((667, 230), 40, 'ESCAPE'))
         self.key_set = False
         self.index = 0
 
@@ -129,10 +163,11 @@ class Setting(Display):
 
     def screen_size_change(self, idx, not_use):
         Display.display_idx = idx
-        self.screen = pg.display.set_mode(C.DISPLAY_SIZE[self.display_idx])
+        self.screen = pg.display.set_mode(C.DISPLAY_SIZE[Display.display_idx])
         self.key_set = False
 
     def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -141,7 +176,15 @@ class Setting(Display):
             elif event.type == pg.MOUSEBUTTONDOWN:
                 for idx, item in enumerate(self.Button_list):
                     if item.above:
-                        item.click((idx, running))
+                        if idx == 10:
+                            if item.button_text == 'OFF': # 색약 모드 컨트롤
+                                item.change_text('ON')
+                            else:
+                                item.change_text('OFF')
+                        elif idx == 11: # 기본 설정으로 세팅
+                            print('Default Options Clicked')
+                        else:
+                            item.click((idx, running))
                         break
                     else:
                         if(self.key_set):
@@ -162,6 +205,7 @@ class Playing(Display):
         pass
 
     def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -188,6 +232,7 @@ class Pause(Display):
             self.mode[C.NEXT_SCREEN] = C.START
 
     def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
