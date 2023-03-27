@@ -6,43 +6,33 @@ import uno.KeySettings as K
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import os
-
-COLORBLIND_MODE = False
-COLORBLIND_COLORS = {
-    'red': (255, 100, 100),
-    'green': (100, 255, 100),
-    'blue': (100, 100, 255),
-    'yellow': (255, 255, 100),
-}
-
-REGULAR_COLORS = {
-    'red': (255, 0, 0),
-    'green': (0, 255, 0),
-    'blue': (0, 0, 255),
-    'yellow': (255, 255, 0),
-}
+import numpy as np
+import torch
 
 class Display(metaclass=ABCMeta):
     # Static Variable
     mode = [C.START, C.START]
     display_idx = 0
     key_idx = -1
+    colorblind_idx = -1
+    COLORBLIND_MATRIX = [torch.tensor(C.PROTANOPIA_MATRIX), torch.tensor(C.DEUTERANOPIA_MATRIX), torch.tensor(C.TRITANOPIA_MATRIX)]
 
-    def __init__(self, colorblind_mode = False):
+    def __init__(self):
         self.Button_list = []
         self.Text_list = []
         self.screen = pg.display.set_mode(C.DISPLAY_SIZE[Display.display_idx])
-        self.colorblind_mode = colorblind_mode
 
     def draw_card(self, card, x, y):
         card_image = pg.image.load(os.path.join('assets', f'{card}.png'))
         self.screen.blit(card_image, (x, y))
 
-    def get_color(self, color_name):
-        if self.colorblind_mode:
-            return COLORBLIND_COLORS.get(color_name, (255, 255, 255))
-        else:
-            return REGULAR_COLORS.get(color_name, (255, 255, 255))
+    def color(self):
+        array = pg.surfarray.array3d(self.screen)
+        rgb_tensor = torch.from_numpy(np.transpose(array[:, :, :3], (2, 0, 1))).float()
+        filtered_rgb_tensor = torch.matmul(Display.COLORBLIND_MATRIX[Display.colorblind_idx], rgb_tensor.view(3, -1)).view(rgb_tensor.shape)
+        filtered_array = np.transpose(filtered_rgb_tensor.numpy(), (1,2,0))
+        filtered_img = pg.surfarray.make_surface(filtered_array.astype('uint8'))        
+        self.screen.blit(filtered_img, (0, 0))
 
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
         for item in self.Button_list:
@@ -52,6 +42,8 @@ class Display(metaclass=ABCMeta):
         for item in self.Text_list:
             item.change_size(Display.display_idx)
             item.draw(self.screen)
+        if Display.colorblind_idx != -1:
+            self.color()
         pg.display.update()
 
     @abstractmethod
@@ -126,31 +118,39 @@ class Start(Display):
 class Setting(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((200, 120), (100, 60), '800x600', lambda idx, running: self.screen_size_change(idx, running)))
-        self.Button_list.append(Button((400, 120), (100, 60), '880x660', lambda idx, running: self.screen_size_change(idx, running)))
-        self.Button_list.append(Button((600, 120), (100, 60), '960x720', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((540, 80), (20, 20), '<', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((740, 80), (20, 20), '>', lambda idx, running: self.screen_size_change(idx, running)))
+        self.Button_list.append(Button((540, 120), (20, 20), '<', lambda idx, running: self.colorblind_control(idx, running)))
+        self.Button_list.append(Button((740, 120), (20, 20), '>', lambda idx, running: self.colorblind_control(idx, running)))
+        self.Button_list.append(Button((640, 210), (120, 30), 'UP', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((640, 250), (120, 30), 'DOWN', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((640, 290), (120, 30), 'RIGHT', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((640, 330), (120, 30), 'LEFT', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((640, 370), (120, 30), 'RETURN', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((640, 410), (120, 30), 'ESCAPE', lambda idx, running: self.button_setting(idx, running)))
+        # self.Button_list.append(Button((400, 470), (140, 60), 'Default Options'))
         self.Button_list.append(Button((400, 550), (200, 60), 'Back', lambda idx, running: self.next_screen(idx, running)))
-        self.Button_list.append(Button((95, 290), (110, 60), 'UP', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((217, 290), (110, 60), 'DOWN', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((339, 290), (110, 60), 'RIGHT', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((461, 290), (110, 60), 'LEFT', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((583, 290), (110, 60), 'RETURN', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((705, 290), (110, 60), 'ESCAPE', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((400, 400), (80, 40), 'OFF'))
-        self.Button_list.append(Button((400, 470), (140, 60), 'Default Options'))
-        self.Text_list.append(Text((353, 40), 40, 'Resolution'))
-        self.Text_list.append(Text((349, 180), 40, 'Key Setting'))
-        self.Text_list.append(Text((331, 350), 40, 'Colorblind Mode'))
-        self.Text_list.append(Text((83, 230), 40, 'UP'))
-        self.Text_list.append(Text((194, 230), 40, 'LEFT'))
-        self.Text_list.append(Text((307, 230), 40, 'DOWN'))
-        self.Text_list.append(Text((430, 230), 40, 'RIGHT'))
-        self.Text_list.append(Text((541, 230), 40, 'RETURN'))
-        self.Text_list.append(Text((667, 230), 40, 'ESCAPE'))
+        self.Text_list.append(Text((20, 20), 30, 'DISPLAY', C.WHITE))
+        self.Text_list.append(Text((40, 70), 20, 'Resolution', C.WHITE))
+        self.Text_list.append(Text((605, 70), 20, '800x600', C.WHITE))
+        self.Text_list.append(Text((40, 110), 20, 'Colorblind Mode', C.WHITE))
+        self.Text_list.append(Text((565, 110), 20, '    Not Applied', C.WHITE))
+        self.Text_list.append(Text((20, 150), 30, 'KEY CONTROL', C.WHITE))
+        self.Text_list.append(Text((40, 200), 20, 'Up', C.WHITE))
+        self.Text_list.append(Text((40, 240), 20, 'Left', C.WHITE))
+        self.Text_list.append(Text((40, 280), 20, 'Down', C.WHITE))
+        self.Text_list.append(Text((40, 320), 20, 'Right', C.WHITE))
+        self.Text_list.append(Text((40, 360), 20, 'Return', C.WHITE))
+        self.Text_list.append(Text((40, 400), 20, 'Escape', C.WHITE))
+        self.Text_list.append(Text((20, 440), 30, 'SOUND', C.WHITE))
+        self.Text_list.append(Text((40, 490), 20, 'Master Volume', C.WHITE))
+        self.Text_list.append(Text((40, 530), 20, 'Music Volume', C.WHITE))
+        self.Text_list.append(Text((40, 570), 20, 'Effect Volume', C.WHITE))
         self.key_set = False
         self.index = 0
         for i in range(6):
             self.Button_list[i+4].change_text(pg.key.name(K.KEY_Settings[i]))
+        self.active = [False, True, False, True, True, True, True, True, True, True, True]
         
     def next_screen(self, not_use, running):
         if self.mode[C.PREV_SCREEN] == C.START:
@@ -163,13 +163,60 @@ class Setting(Display):
         self.key_set = True
         self.index = idx
 
+    def update_screen(self, mouse_pos):
+        pg.draw.line(self.screen, C.WHITE, [160, 35], [780, 35], 3)
+        pg.draw.line(self.screen, C.WHITE, [250, 165], [780, 165], 3)
+        pg.draw.line(self.screen, C.WHITE, [140, 455], [780, 455], 3)
+        for idx, item in enumerate(self.Button_list):
+            if self.active[idx]:
+                item.change_size(Display.display_idx)
+                item.update(mouse_pos)
+                item.draw(self.screen)
+        for item in self.Text_list:
+            item.change_size(Display.display_idx)
+            item.draw(self.screen)
+        if Display.colorblind_idx != -1:
+            self.color()
+        pg.display.update()
+
     def screen_size_change(self, idx, not_use):
-        Display.display_idx = idx
+        if idx == 0:
+            Display.display_idx -= 1
+            if Display.display_idx == 0:
+                self.active[0] = False
+            elif Display.display_idx == 1:
+                self.active[1] = True
+        else:
+            Display.display_idx += 1
+            if Display.display_idx == 2:
+                self.active[1] = False
+            elif Display.display_idx == 1:
+                self.active[0] = True
         self.screen = pg.display.set_mode(C.DISPLAY_SIZE[Display.display_idx])
+        self.Text_list[2].change_text(C.DISPLAY_SIZE_STR[Display.display_idx])
+        self.key_set = False
+
+    def colorblind_control(self, idx, not_use):
+        if idx == 2:
+            Display.colorblind_idx -= 1
+            if Display.colorblind_idx == -1:
+                self.active[2] = False
+            elif Display.colorblind_idx == 1:
+                self.active[3] = True
+        else:
+            Display.colorblind_idx += 1
+            if Display.colorblind_idx == 2:
+                self.active[3] = False
+            elif Display.colorblind_idx == 0:
+                self.active[2] = True
+        if Display.colorblind_idx == -1:
+            self.Text_list[4].change_text("    Not Applied")
+        else:
+            self.Text_list[4].change_text(C.COLORBLINDMODE_STR[Display.colorblind_idx])
         self.key_set = False
 
     def main_loop(self, running):
-        self.screen.fill((255, 255, 255))
+        self.screen.fill((0, 0, 0))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -177,16 +224,8 @@ class Setting(Display):
                 return
             elif event.type == pg.MOUSEBUTTONDOWN:
                 for idx, item in enumerate(self.Button_list):
-                    if item.above:
-                        if idx == 10:
-                            if item.button_text == 'OFF': # 색약 모드 컨트롤
-                                item.change_text('ON')
-                            else:
-                                item.change_text('OFF')
-                        elif idx == 11: # 기본 설정으로 세팅
-                            print('Default Options Clicked')
-                        else:
-                            item.click((idx, running))
+                    if item.above and self.active[idx]:
+                        item.click((idx, running))
                         break
                     else:
                         if(self.key_set):
