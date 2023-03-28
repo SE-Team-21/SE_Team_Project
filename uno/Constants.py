@@ -42,15 +42,15 @@ BLACK_CARD_TYPES = ['wildcard', '+4']
 ARBITRARY_BLACK_CARD_TYPES = ['wildcard_fuck', 'wildcard+10']
 ARBITRARY_COLOR_CARD_TYPES = ['all+1']
 CARD_TYPES = NUMBERS + SPECIAL_CARD_TYPES + BLACK_CARD_TYPES
+TECH_CARD_TYPES = SPECIAL_CARD_TYPES + BLACK_CARD_TYPES + ARBITRARY_BLACK_CARD_TYPES + ARBITRARY_COLOR_CARD_TYPES
 
 # Colorblind Mode
-PROTANOPIA_MATRIX = [[0.567, 0.433, 0], [0.558, 0.442, 0], [0, 0.242, 0.758]]
-DEUTERANOPIA_MATRIX = [[0.625, 0.375, 0], [0.7, 0.3, 0], [0, 0.3, 0.7]]
-TRITANOPIA_MATRIX = [[0.95, 0.05, 0], [0, 0.433, 0.567], [0, 0.475, 0.525]]
+PROTANOPIA_MATRIX = [[0.45, 0.35, 0.20], [0.43, 0.35, 0.22], [0.01, 0.40, 0.59]]
+DEUTERANOPIA_MATRIX = [[0.55, 0.30, 0.15], [0.65, 0.25, 0.10], [0.01, 0.25, 0.74]]
+TRITANOPIA_MATRIX = [[0.96, 0.04, 0], [0, 0.73, 0.27], [0, 0.13,  0.87]]
 COLORBLINDMODE_STR = ['  PROTANOPIA', 'DEUTERANOPIA', '   TRITANOPIA']
 
 # Card List 
-# here ===================================================
 ALL_CARDS = {"blue0": CardButton("blue0"), 
              "blue1": CardButton("blue1"), 
              "blue2": CardButton("blue2"), 
@@ -61,6 +61,4 @@ ALL_CARDS = {"blue0": CardButton("blue0"),
              "blue7": CardButton("blue7"), 
              "blue8": CardButton("blue8"), 
              "blue9": CardButton("blue9"), 
-            
              }
-# here ===================================================
