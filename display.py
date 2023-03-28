@@ -8,6 +8,9 @@ from uno.Text_Class import Text
 import os
 import numpy as np
 import torch
+from test import *
+from uno.CardButton_Class import CardButton
+import test
 
 class Display(metaclass=ABCMeta):
     # Static Variable
@@ -64,7 +67,7 @@ class Start(Display):
 
     def next_screen(self, idx, running):
         if idx == 0:                            
-            self.mode[C.NEXT_SCREEN] = C.PLAYING
+            self.mode[C.NEXT_SCREEN] = C.MODE
         elif idx == 1:
             self.mode[C.NEXT_SCREEN] = C.SETTING
             self.mode[C.PREV_SCREEN] = C.START
@@ -164,9 +167,9 @@ class Setting(Display):
         self.index = idx
 
     def update_screen(self, mouse_pos):
-        pg.draw.line(self.screen, C.WHITE, [160, 35], [780, 35], 3)
-        pg.draw.line(self.screen, C.WHITE, [250, 165], [780, 165], 3)
-        pg.draw.line(self.screen, C.WHITE, [140, 455], [780, 455], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(160*C.WEIGHT[Display.display_idx]), int(35*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(35*C.WEIGHT[Display.display_idx])], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(250*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(140*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], 3)
         for idx, item in enumerate(self.Button_list):
             if self.active[idx]:
                 item.change_size(Display.display_idx)
@@ -246,14 +249,34 @@ class Setting(Display):
 class Playing(Display):
     def __init__(self):
         super().__init__()
+# here ===================================================
+        game_start()
+        self.Card_list = []
+        
+        # self.Card_list.append(CardButton((10,10), (60,120)))
+        for i in test.game.players[0].hand:
+            if str(i.color) + str(i.card_type) in C.ALL_CARDS:
+                self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
+                print(self.Card_list[0].img)
+            
+        '''
         self.Text_list.append(Text((220, 60), 40, 'Playing Display'))
         self.Text_list.append(Text((220, 120), 40, 'Press ESC to PAUSE Menu'))
-
+        '''
+# here ===================================================
     def next_screen(self):
         pass
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
+        self.Card_list = []
+        # for i in test.game.players[0].hand:
+            
+            # self.Card_list.append(CardButton())
+            # print(i.color, i.card_type)
+        
+        # self.Card_list[0].draw(self.screen)
+
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -290,3 +313,95 @@ class Pause(Display):
                 for idx, item in enumerate(self.Button_list):
                     if item.above:
                         item.click((idx, running))
+
+class Story(Display):
+    def __init__(self):
+        super().__init__()
+        #self.Button_list.append(Button((100, 150), (200, 200), 'Area1', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 250), (120, 60), 'Area2', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 350), (120, 60), 'Area3', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 350), (120, 60), 'Area4', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((400, 500), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
+        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_map.png"), C.DISPLAY_SIZE[Display.display_idx])
+        self.cloudimg = pg.transform.scale(pg.image.load("./assets/images/cloud.png"), (int(444*C.WEIGHT[Display.display_idx]), int(300*C.WEIGHT[Display.display_idx])))
+        
+    def next_screen(self, idx, running):
+        if idx==0:
+            self.mode[C.NEXT_SCREEN] = C.START
+
+    def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
+        self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
+        self.screen.blit(self.backgroundimg, (0, 0))
+        self.screen.blit(self.cloudimg, (int(50*C.WEIGHT[Display.display_idx]), int(160*C.WEIGHT[Display.display_idx])))
+        self.screen.blit(self.cloudimg, (int(370*C.WEIGHT[Display.display_idx]), int(170*C.WEIGHT[Display.display_idx])))
+        self.screen.blit(self.cloudimg, (int(310*C.WEIGHT[Display.display_idx]), 0))
+        self.update_screen(pg.mouse.get_pos())
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                running[0] = False
+                return
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                for idx, item in enumerate(self.Button_list):
+                    if item.above:
+                        item.click((idx, running))
+
+class Mode(Display):
+    def __init__(self):
+        super().__init__()
+        self.Button_list.append(Button((100, 150), (120, 60), 'Story Mode', lambda x,y: self.next_screen(x,y)))  #스토리모드 선택
+        self.Button_list.append(Button((100, 300), (120, 60), 'Single Mode', lambda x,y: self.next_screen(x,y)))  #싱글모드 선택
+        self.Button_list.append(Button((100, 450), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))  #시작 화면 되돌아가기
+        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
+
+    def next_screen(self, idx, running):
+        if idx == 0:                            
+            self.mode[C.NEXT_SCREEN] = C.STORY
+        elif idx == 1:
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
+        elif idx == 2:
+            self.mode[C.NEXT_SCREEN] = C.START
+    
+    def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
+        self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
+        self.screen.blit(self.backgroundimg, (0, 0))
+        self.update_screen(pg.mouse.get_pos())
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                running[0] = False
+                return
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.Button_list[Display.key_idx].on_key = False
+                Display.key_idx = -1
+                for idx, item in enumerate(self.Button_list):
+                    if item.above:
+                        item.click((idx, running))
+            elif event.type == pg.KEYUP:
+                for idx, item in enumerate(K.KEY_Settings):
+                    if event.key == item:
+                        if idx == 0 or idx == 1: # Up and Left Key
+                            if Display.key_idx == 0:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx = len(self.Button_list)-1
+                            elif Display.key_idx == -1:
+                                Display.key_idx = 0
+                            else:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx -= 1
+                            self.Button_list[Display.key_idx].on_key = True
+                        elif idx == 2 or idx == 3: # Right and Down Key
+                            if Display.key_idx == len(self.Button_list)-1:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx = 0
+                            elif Display.key_idx == -1:
+                                Display.key_idx = 0
+                            else:
+                                self.Button_list[Display.key_idx].on_key = False
+                                Display.key_idx += 1
+                            self.Button_list[Display.key_idx].on_key = True
+                        elif idx == 4: # Return Key
+                            if Display.key_idx != -1:
+                                self.Button_list[Display.key_idx].on_key = False
+                                self.next_screen(Display.key_idx, running)
+                                Display.key_idx = -1
