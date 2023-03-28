@@ -58,4 +58,3 @@ class UnoCard:
             self.card_type == other.card_type or
             other.color == 'black'
         )
-
