@@ -3,30 +3,16 @@ from uno.game.Player import UnoPlayer
 from uno.game.ReversibleCycle import ReversibleCycle
 from random import shuffle, random
 from itertools import product, repeat, chain
-from uno.Constants import COLORS, COLOR_CARD_TYPES, BLACK_CARD_TYPES, ARBITRARY_BLACK_CARD_TYPES, ARBITRARY_COLOR_CARD_TYPES, TECH_CARD_TYPES
-import copy
+from uno.Constants import COLORS, COLOR_CARD_TYPES, BLACK_CARD_TYPES, ARBITRARY_BLACK_CARD_TYPES, ARBITRARY_COLOR_CARD_TYPES
+
 
 class UnoGame:
-    def __init__(self, players, probability=-1, init_deal_cnt= 7, random=True):
-        self.init_deal_cnt = init_deal_cnt
-        self.probability = probability
+    def __init__(self, players, random=True):
         if not isinstance(players, int):
             raise ValueError('Invalid game: players must be integer')
         if not 2 <= players <= 15:
             raise ValueError('Invalid game: must be between 2 and 15 players')
         self.deck = self._create_deck(random)
-
-        self.all_card_cnt = len(self.deck_full)
-        self.tech_card_cnt = 0
-        for i in self.deck_full:
-            if any(card_type in str(i) for card_type in TECH_CARD_TYPES):
-                self.tech_card_cnt += 1
-        self.num_card_cnt = self.all_card_cnt - self.tech_card_cnt
-        if (probability != -1):
-            tech = (1 + self.probability / 100) * self.tech_card_cnt
-            tot = 1 * self.num_card_cnt + tech
-            self.tech_prob = tech / tot
-
         self.players = [
             UnoPlayer(self._deal_hand(), n) for n in range(players)
         ]
@@ -45,33 +31,15 @@ class UnoGame:
                                 product(COLORS, ARBITRARY_COLOR_CARD_TYPES))
         all_cards = chain(color_cards, black_cards, Arbitrary_cards)
         deck = [UnoCard(color, card_type) for color, card_type in all_cards]
-        self.deck_full = copy.deepcopy(deck)
+        print(deck)
         if random:
             shuffle(deck)
             return deck
         else:
             return list(reversed(deck))
 
-    def _deal_prob(self, n):
-        ret = list()
-        for i in range(n):
-            if random() <= self.tech_prob:
-                for j, card in enumerate(self.deck):
-                    if any(card_type in str(card) for card_type in TECH_CARD_TYPES):
-                        ret.append(self.deck.pop(j))
-                        break
-            else:
-                for j, card in enumerate(self.deck):
-                    if not any(card_type in str(card) for card_type in TECH_CARD_TYPES):
-                        ret.append(self.deck.pop(j))
-                        break
-        return ret.append
-
     def _deal_hand(self):
-        if self.probability == -1:
-            return [self.deck.pop() for i in range(self.init_deal_cnt)]
-        else:
-            return self._deal_prob(self.init_deal_cnt)
+        return [self.deck.pop() for i in range(7)]
 
     @property
     def current_card(self):
@@ -127,7 +95,7 @@ class UnoGame:
                 next(self)
                 self._pick_up(self.current_player, 4)
             if card_type == 'wildcard_fuck':
-                if random() < 0.05:
+                if random() < 0.1:
                     _player.hand.clear()
                 next(self)
             if card_type == 'wildcard+10':
@@ -161,10 +129,6 @@ class UnoGame:
         print("Player {} wins!".format(winner_name))
 
     def _pick_up(self, player, n):
-        if self.probability == -1:
-            penalty_cards = [self.deck.pop(0) for i in range(n)]
-            player.hand.extend(penalty_cards)
-        else:
-            penalty_cards = self._deal_prob(self.init_deal_cnt)
-            player.hand.extend(penalty_cards)
+        penalty_cards = [self.deck.pop(0) for i in range(n)]
+        player.hand.extend(penalty_cards)
 
