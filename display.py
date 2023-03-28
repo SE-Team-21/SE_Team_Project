@@ -19,7 +19,6 @@ class Display(metaclass=ABCMeta):
     key_idx = -1
     colorblind_idx = -1
     COLORBLIND_MATRIX = [torch.tensor(C.PROTANOPIA_MATRIX), torch.tensor(C.DEUTERANOPIA_MATRIX), torch.tensor(C.TRITANOPIA_MATRIX)]
-    
 
     def __init__(self):
         self.Button_list = []
@@ -61,8 +60,9 @@ class Display(metaclass=ABCMeta):
 class Start(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((100, 150), (120, 60), 'Play', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((100, 300), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 150), (120, 60), 'Single Play', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 250), (120, 60), 'Story Mode', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 350), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((100, 450), (120, 60), 'Quit', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
 
@@ -70,9 +70,11 @@ class Start(Display):
         if idx == 0:                            
             self.mode[C.NEXT_SCREEN] = C.PLAYING
         elif idx == 1:
+            self.mode[C.NEXT_SCREEN] = C.STORY
+        elif idx == 2:
             self.mode[C.NEXT_SCREEN] = C.SETTING
             self.mode[C.PREV_SCREEN] = C.START
-        elif idx == 2:
+        elif idx == 3:
             running[0] = False
     
     def main_loop(self, running):
@@ -168,9 +170,9 @@ class Setting(Display):
         self.index = idx
 
     def update_screen(self, mouse_pos):
-        pg.draw.line(self.screen, C.WHITE, [160, 35], [780, 35], 3)
-        pg.draw.line(self.screen, C.WHITE, [250, 165], [780, 165], 3)
-        pg.draw.line(self.screen, C.WHITE, [140, 455], [780, 455], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(160*C.WEIGHT[Display.display_idx]), int(35*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(35*C.WEIGHT[Display.display_idx])], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(250*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], 3)
+        pg.draw.line(self.screen, C.WHITE, [int(140*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], 3)
         for idx, item in enumerate(self.Button_list):
             if self.active[idx]:
                 item.change_size(Display.display_idx)
@@ -305,6 +307,33 @@ class Pause(Display):
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
+        self.update_screen(pg.mouse.get_pos())
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                running[0] = False
+                return
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                for idx, item in enumerate(self.Button_list):
+                    if item.above:
+                        item.click((idx, running))
+
+class Story(Display):
+    def __init__(self):
+        super().__init__()
+        self.Button_list.append(Button((100, 150), (120, 60), 'Area1', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 250), (120, 60), 'Area2', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 350), (120, 60), 'Area3', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 450), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
+        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_img.png"), C.DISPLAY_SIZE[Display.display_idx])
+
+    def next_screen(self, idx, running):
+        if idx==3:
+            self.mode[C.NEXT_SCREEN] = C.START
+
+    def main_loop(self, running):
+        self.screen.fill((255, 255, 255))
+        self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
+        self.screen.blit(self.backgroundimg, (0, 0))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
