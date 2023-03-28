@@ -11,7 +11,8 @@ def uno_mainloop():
     b = D.Setting()
     c = D.Playing()
     d = D.Pause()
-    e = D.Story()
+    e = D.Mode()
+    f = D.Story()
     running = [True]
     while running[0]:
         if D.Display.mode[C.NEXT_SCREEN] == C.START:
@@ -22,8 +23,10 @@ def uno_mainloop():
             c.main_loop(running)
         elif D.Display.mode[C.NEXT_SCREEN] == C.STOP:
             d.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.STORY:
+        elif D.Display.mode[C.NEXT_SCREEN] == C.MODE:
             e.main_loop(running)
+        elif D.Display.mode[C.NEXT_SCREEN] == C.STORY:
+            f.main_loop(running)
     pg.quit()
 
 if __name__ == "__main__":
