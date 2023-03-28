@@ -11,7 +11,7 @@ class CardButton:
         self.function = function
         self.above = False
         self.on_key = False
-        self.img = pg.transform.scale(pg.image.load("C:/Users/USER/Desktop/SE_Team_Project-main/assets/images/"+ card_name + ".png"), (60,120))
+        self.img = pg.transform.scale(pg.image.load("./assets/images/"+ card_name + ".png"), (60,120))
 
     def update(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
@@ -47,4 +47,3 @@ class CardButton:
         self.text = self.FONT.render(text, True, C.BLACK)
         self.text_rect = self.text.get_rect(center=self.pos)
         '''
-
