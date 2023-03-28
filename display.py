@@ -273,7 +273,7 @@ class Playing(Display):
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
         self.Card_list = []
-        for i in game.players[0].hand:
+        for i in test.game.players[0].hand:
             
             self.Card_list.append(CardButton())
             print(i.color, i.card_type)
@@ -320,20 +320,25 @@ class Pause(Display):
 class Story(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((100, 150), (120, 60), 'Area1', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((100, 250), (120, 60), 'Area2', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((100, 350), (120, 60), 'Area3', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((100, 450), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
-        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_img.png"), C.DISPLAY_SIZE[Display.display_idx])
-
+        #self.Button_list.append(Button((100, 150), (200, 200), 'Area1', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 250), (120, 60), 'Area2', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 350), (120, 60), 'Area3', lambda x,y: self.next_screen(x,y)))
+        #self.Button_list.append(Button((100, 350), (120, 60), 'Area4', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((400, 500), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
+        self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_map.png"), C.DISPLAY_SIZE[Display.display_idx])
+        self.cloudimg = pg.transform.scale(pg.image.load("./assets/images/cloud.png"), (int(444*C.WEIGHT[Display.display_idx]), int(300*C.WEIGHT[Display.display_idx])))
+        
     def next_screen(self, idx, running):
-        if idx==3:
+        if idx==0:
             self.mode[C.NEXT_SCREEN] = C.START
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
         self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
         self.screen.blit(self.backgroundimg, (0, 0))
+        self.screen.blit(self.cloudimg, (int(50*C.WEIGHT[Display.display_idx]), int(160*C.WEIGHT[Display.display_idx])))
+        self.screen.blit(self.cloudimg, (int(370*C.WEIGHT[Display.display_idx]), int(170*C.WEIGHT[Display.display_idx])))
+        self.screen.blit(self.cloudimg, (int(310*C.WEIGHT[Display.display_idx]), 0))
         self.update_screen(pg.mouse.get_pos())
         for event in pg.event.get():
             if event.type == pg.QUIT:
