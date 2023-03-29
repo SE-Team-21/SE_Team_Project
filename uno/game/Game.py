@@ -12,7 +12,7 @@ class UnoGame:
         self.probability = probability
         if not isinstance(players, int):
             raise ValueError('Invalid game: players must be integer')
-        if not 2 <= players <= 15:
+        elif unit_test_deck is None and not 2 <= players <= 15:
             raise ValueError('Invalid game: must be between 2 and 15 players')
         if unit_test_deck is None:
             self.deck = self._create_deck(random)
@@ -23,14 +23,13 @@ class UnoGame:
         self.all_card_cnt = len(self.deck_full)
         self.tech_card_cnt = 0
         for i in self.deck_full:
-            if any(card_type in str(i) for card_type in TECH_CARD_TYPES):
+            if any(card_type in str(i.card_type) for card_type in TECH_CARD_TYPES):
                 self.tech_card_cnt += 1
         self.num_card_cnt = self.all_card_cnt - self.tech_card_cnt
         if (probability != -1):
             tech = (1 + self.probability / 100) * self.tech_card_cnt
             tot = 1 * self.num_card_cnt + tech
             self.tech_prob = tech / tot
-
         self.players = [
             UnoPlayer(self._deal_hand(), n) for n in range(players)
         ]
@@ -61,12 +60,12 @@ class UnoGame:
         for i in range(n):
             if random() <= self.tech_prob:
                 for j, card in enumerate(self.deck):
-                    if any(card_type in str(card) for card_type in TECH_CARD_TYPES):
+                    if any(card_type in str(card.card_type) for card_type in TECH_CARD_TYPES):
                         ret.append(self.deck.pop(j))
                         break
             else:
                 for j, card in enumerate(self.deck):
-                    if not any(card_type in str(card) for card_type in TECH_CARD_TYPES):
+                    if not any(card_type in str(card.card_type) for card_type in TECH_CARD_TYPES):
                         ret.append(self.deck.pop(j))
                         break
         return ret
