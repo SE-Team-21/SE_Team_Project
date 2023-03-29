@@ -2,10 +2,6 @@ from uno.game.Card import UnoCard
 
 class UnoPlayer:
     def __init__(self, cards, player_id=None):
-        if len(cards) != 7:
-            raise ValueError(
-                'Invalid player: must be initalised with 7 UnoCards'
-            )
         if not all(isinstance(card, UnoCard) for card in cards):
             raise ValueError(
                 'Invalid player: cards must all be UnoCard objects'
