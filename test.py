@@ -12,7 +12,7 @@ player_id = None
 def game_start():
     global game, player, player_id
     game = UnoGame(5)
-    """while game.is_active:
+    while game.is_active:
         player = game.current_player
         player_id = player.player_id
         if player.can_play(game.current_card):
@@ -28,4 +28,4 @@ def game_start():
         else:
             print("Player {} picked up".format(player))
             game.play(player=player_id, card=None)
-game_start()"""
+game_start()

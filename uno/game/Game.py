@@ -7,14 +7,18 @@ from uno.Constants import COLORS, COLOR_CARD_TYPES, BLACK_CARD_TYPES, ARBITRARY_
 import copy
 
 class UnoGame:
-    def __init__(self, players, probability=-1, init_deal_cnt= 7, random=True):
+    def __init__(self, players, probability=-1, init_deal_cnt= 7, unit_test_deck=None, random=True):
         self.init_deal_cnt = init_deal_cnt
         self.probability = probability
         if not isinstance(players, int):
             raise ValueError('Invalid game: players must be integer')
         if not 2 <= players <= 15:
             raise ValueError('Invalid game: must be between 2 and 15 players')
-        self.deck = self._create_deck(random)
+        if unit_test_deck is None:
+            self.deck = self._create_deck(random)
+        else:
+            self.deck = unit_test_deck
+            self.deck_full = copy.deepcopy(self.deck)
 
         self.all_card_cnt = len(self.deck_full)
         self.tech_card_cnt = 0
@@ -65,7 +69,7 @@ class UnoGame:
                     if not any(card_type in str(card) for card_type in TECH_CARD_TYPES):
                         ret.append(self.deck.pop(j))
                         break
-        return ret.append
+        return ret
 
     def _deal_hand(self):
         if self.probability == -1:
