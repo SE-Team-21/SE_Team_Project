@@ -114,4 +114,5 @@ ALL_CARDS = {"blue0": CardButton("blue0", "blue", "0"),
              "blackwildcard": CardButton("blackwildcard","black", "wildcard"), 
              "blackwildcard_fuck": CardButton("blackwildcard_fuck","black", "wildcard_fuck"), 
              "blackwildcard+10": CardButton("blackwildcard+10","black", "wildcard+10"),
+             "Back": CardButton("Back","Ba", "ck"),
              }

@@ -6,7 +6,10 @@ class CardButton:
         #self.default_pos = pos
         #self.pos = pos
         #self.size = size
-        
+        pg.font.init()
+        self.FONT = pg.font.SysFont(C.FONT, C.DEFAULT_SIZE)
+        self.text = self.FONT.render('', True, C.WHITE)
+
         self.color = C.INACTIVE_COLOR
         self.function = function
         self.above = False
@@ -21,13 +24,14 @@ class CardButton:
         else:
             self.above = False
 
-    def draw(self, screen):
-        if self.above or self.on_key:
-            self.color = C.ABOVE_COLOR
-        else:
-            self.color = C.INACTIVE_COLOR
+    def draw(self, screen, x, y):
         # pg.draw.rect(screen, self.color, self.rect)
-        screen.blit(self.img, (10,10))
+        self.text_rect = self.text.get_rect(center=(x,y))
+        self.rect = pg.Rect(0, 0, 45, 90)
+        self.rect.center = (x,y)
+        pg.draw.rect(screen, C.WHITE, self.rect)
+        screen.blit(self.text, self.text_rect)
+        screen.blit(self.img, (x,y))
 
     def click(self, params = None):
         if self.function:

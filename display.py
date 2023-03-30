@@ -8,10 +8,8 @@ from uno.Text_Class import Text
 import os
 import numpy as np
 import torch
-from test import *
 from uno.CardButton_Class import CardButton
-import test
-
+from uno.game.Game import UnoGame
 
 class Display(metaclass=ABCMeta):
     # Static Variable
@@ -248,10 +246,10 @@ class Setting(Display):
 
 
 class Playing(Display):
+    game = None
     def __init__(self):
         super().__init__()
 # here ===================================================
-        game_start()
         self.Card_list = []
         self.x = 0
         self.y = 0
@@ -264,14 +262,18 @@ class Playing(Display):
         self.Text_list.append(Text((220, 120), 40, 'Press ESC to PAUSE Menu'))
         '''
 # here ===================================================
+    def update_screen(self, mouse_pos): # 현재 화면 업데이트
+        super().update_screen(mouse_pos)
+        for item in self.Card_list:
+            item.update(mouse_pos)
+
     def next_screen(self):
         pass
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
         #self.Card_list = []
-        # for i in test.game.players[0].hand:
-            
+        # for i in Playing.game.players[0].hand:
             # self.Card_list.append(CardButton())
             # print(i.color, i.card_type)
         
@@ -279,18 +281,33 @@ class Playing(Display):
         self.x = 0
         self.y = 300
         #self.update_screen(pg.mouse.get_pos())
-        self.top = C.ALL_CARDS[str(test.game.current_card.color) + str(test.game.current_card.card_type)]
-        self.screen.blit(self.top.img, (0,0))
-        for i in test.game.players[0].hand:
-            if self.top.card_color == C.ALL_CARDS[str(i.color) + str(i.card_type)].card_color:
-                self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
-                self.screen.blit(C.ALL_CARDS[str(i.color) + str(i.card_type)].img, (self.x, self.y))
+        self.top = C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)]
+        self.screen.blit(self.top.img, (150,100))
+        self.backCard = C.ALL_CARDS["Back"]
+        self.screen.blit(self.backCard.img, (100, 100))
+
+        self.x_ = 0
+        self.y_ = 0
+        for player in Playing.game.players:
+            self.screen.blit(self.backCard.img, (self.x_, self.y_))
+            self.y_ = self.y_ + 100
+
+
+        for i in Playing.game.players[0].hand:
+            
+            myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
+            myCard.function = lambda: print(myCard.card_color)
+            '''
+            if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
+                self.Card_list.append(myCard)
+                self.screen.blit(myCard.img, (self.x, self.y))
             self.x += 50
             '''
+            
             self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
-            self.screen.blit(C.ALL_CARDS[str(i.color) + str(i.card_type)].img, (self.x, self.y))
+            myCard.draw(self.screen, self.x, self.y)
             self.x += 50
-            '''
+        self.update_screen(pg.mouse.get_pos())
         pg.display.update()
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -299,6 +316,10 @@ class Playing(Display):
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_ESCAPE:
                     self.mode[C.NEXT_SCREEN] = C.STOP
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                for idx, item in enumerate(self.Card_list):
+                    if item.above:
+                        item.click()
 
 class Pause(Display):
     def __init__(self):
@@ -369,10 +390,12 @@ class Mode(Display):
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
 
     def next_screen(self, idx, running):
-        if idx == 0:                            
+        if idx == 0:
             self.mode[C.NEXT_SCREEN] = C.STORY
         elif idx == 1:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
+            if Playing.game == None:
+                Playing.game = UnoGame(5)
         elif idx == 2:
             self.mode[C.NEXT_SCREEN] = C.START
     

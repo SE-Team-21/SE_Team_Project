@@ -16,7 +16,7 @@ def uno_mainloop():
     running = [True]
     while running[0]:
         if D.Display.mode[C.NEXT_SCREEN] == C.START:
-            c.main_loop(running)
+            a.main_loop(running)
         elif D.Display.mode[C.NEXT_SCREEN] == C.SETTING:
             b.main_loop(running)
         elif D.Display.mode[C.NEXT_SCREEN] == C.PLAYING:
