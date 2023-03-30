@@ -2,15 +2,15 @@ import pygame as pg
 from abc import *
 from pygame.locals import *
 import uno.Constants as C
-import uno.KeySettings as K
+from uno.KeySettings import Data
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 import os
 import numpy as np
 import torch
-from test import *
 from uno.CardButton_Class import CardButton
-import test
+from uno.game.Game import UnoGame
+from uno.Music import Background_Music as bm
 
 class Display(metaclass=ABCMeta):
     # Static Variable
@@ -90,7 +90,7 @@ class Start(Display):
                     if item.above:
                         item.click((idx, running))
             elif event.type == pg.KEYUP:
-                for idx, item in enumerate(K.KEY_Settings):
+                for idx, item in enumerate(Data.KEY_Settings):
                     if event.key == item:
                         if idx == 0 or idx == 1: # Up and Left Key
                             if Display.key_idx == 0:
@@ -117,6 +117,11 @@ class Start(Display):
                                 self.Button_list[Display.key_idx].on_key = False
                                 self.next_screen(Display.key_idx, running)
                                 Display.key_idx = -1
+    pg.mixer.init()                            	
+    pg.mixer.music.load("assets/sounds/bg_music.wav")	
+    pg.mixer.music.play(-1)	
+    pg.mixer.music.load("assets/sounds/bg.wav")	
+    pg.mixer.music.play(-1)
 
 class Setting(Display):
     def __init__(self):
@@ -152,7 +157,7 @@ class Setting(Display):
         self.key_set = False
         self.index = 0
         for i in range(6):
-            self.Button_list[i+4].change_text(pg.key.name(K.KEY_Settings[i]))
+            self.Button_list[i+4].change_text(pg.key.name(Data.KEY_Settings[i]))
         self.active = [False, True, False, True, True, True, True, True, True, True, True]
         
     def next_screen(self, not_use, running):
@@ -235,9 +240,9 @@ class Setting(Display):
                             self.key_set = False
             if(self.key_set):
                 if event.type == pg.KEYUP:
-                    if event.key not in K.KEY_Settings:
+                    if event.key not in Data.KEY_Settings:
                         self.Button_list[self.index].change_text(pg.key.name(event.key))
-                        K.save_settings(self.index-4, event.key)
+                        Data.save_settings(self.index-4, event.key)
                         self.key_set = False
                     else:
                         warning = Button((400, 300), (300, 60), 'The key is already in use', color=C.RED)
@@ -247,37 +252,69 @@ class Setting(Display):
 
 
 class Playing(Display):
+    game = None
     def __init__(self):
         super().__init__()
 # here ===================================================
-        game_start()
         self.Card_list = []
-        
+        self.x = 0
+        self.y = 0
+
         # self.Card_list.append(CardButton((10,10), (60,120)))
-        for i in test.game.players[0].hand:
-            if str(i.color) + str(i.card_type) in C.ALL_CARDS:
-                self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
-                print(self.Card_list[0].img)
+        
             
         '''
         self.Text_list.append(Text((220, 60), 40, 'Playing Display'))
         self.Text_list.append(Text((220, 120), 40, 'Press ESC to PAUSE Menu'))
         '''
 # here ===================================================
+    def update_screen(self, mouse_pos): # 현재 화면 업데이트
+        super().update_screen(mouse_pos)
+        for item in self.Card_list:
+            item.update(mouse_pos)
+
     def next_screen(self):
         pass
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
-        self.Card_list = []
-        # for i in test.game.players[0].hand:
-            
+        #self.Card_list = []
+        # for i in Playing.game.players[0].hand:
             # self.Card_list.append(CardButton())
             # print(i.color, i.card_type)
         
         # self.Card_list[0].draw(self.screen)
+        self.x = 0
+        self.y = 300
+        #self.update_screen(pg.mouse.get_pos())
+        self.top = C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)]
+        self.screen.blit(self.top.img, (150,100))
+        self.backCard = C.ALL_CARDS["Back"]
+        self.screen.blit(self.backCard.img, (100, 100))
 
+        self.x_ = 0
+        self.y_ = 0
+        for player in Playing.game.players:
+            self.screen.blit(self.backCard.img, (self.x_, self.y_))
+            self.y_ = self.y_ + 100
+
+
+        for i in Playing.game.players[0].hand:
+            
+            myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
+            myCard.function = lambda: print(myCard.card_color)
+            '''
+            if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
+                self.Card_list.append(myCard)
+                self.screen.blit(myCard.img, (self.x, self.y))
+            self.x += 50
+            '''
+            
+            self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
+            myCard.draw(self.screen, self.x, self.y)
+            self.x += 50
         self.update_screen(pg.mouse.get_pos())
+        pg.display.update()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running[0] = False
@@ -285,6 +322,10 @@ class Playing(Display):
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_ESCAPE:
                     self.mode[C.NEXT_SCREEN] = C.STOP
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                for idx, item in enumerate(self.Card_list):
+                    if item.above:
+                        item.click()
 
 class Pause(Display):
     def __init__(self):
@@ -317,10 +358,11 @@ class Pause(Display):
 class Story(Display):
     def __init__(self):
         super().__init__()
-        #self.Button_list.append(Button((100, 150), (200, 200), 'Area1', lambda x,y: self.next_screen(x,y)))
-        #self.Button_list.append(Button((100, 250), (120, 60), 'Area2', lambda x,y: self.next_screen(x,y)))
-        #self.Button_list.append(Button((100, 350), (120, 60), 'Area3', lambda x,y: self.next_screen(x,y)))
-        #self.Button_list.append(Button((100, 350), (120, 60), 'Area4', lambda x,y: self.next_screen(x,y)))
+        self.Area_list = []
+        self.Area_list.append(Button((162, 112), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
+        self.Area_list.append(Button((302, 321), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
+        self.Area_list.append(Button((567, 112), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
+        self.Area_list.append(Button((666, 357), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
         self.Button_list.append(Button((400, 500), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_map.png"), C.DISPLAY_SIZE[Display.display_idx])
         self.cloudimg = pg.transform.scale(pg.image.load("./assets/images/cloud.png"), (int(444*C.WEIGHT[Display.display_idx]), int(300*C.WEIGHT[Display.display_idx])))
@@ -329,8 +371,25 @@ class Story(Display):
         if idx==0:
             self.mode[C.NEXT_SCREEN] = C.START
 
+    def next_screen_2(self, idx, running):	
+        if idx==0:	
+            self.mode[C.NEXT_SCREEN] = C.PLAYING    	
+        if idx==1:	
+            self.mode[C.NEXT_SCREEN] = C.PLAYING	
+        if idx==2:	
+            self.mode[C.NEXT_SCREEN] = C.PLAYING	
+        if idx==3:	
+            self.mode[C.NEXT_SCREEN] = C.PLAYING	
+
+    def update_area(self, mouse_pos):	
+        for item in self.Area_list:	
+            item.change_size(Display.display_idx)	
+            item.update(mouse_pos)	
+            item.draw(self.screen)
+
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
+        self.update_area(pg.mouse.get_pos())
         self.backgroundimg = pg.transform.scale(self.backgroundimg, C.DISPLAY_SIZE[Display.display_idx])
         self.screen.blit(self.backgroundimg, (0, 0))
         self.screen.blit(self.cloudimg, (int(50*C.WEIGHT[Display.display_idx]), int(160*C.WEIGHT[Display.display_idx])))
@@ -345,7 +404,9 @@ class Story(Display):
                 for idx, item in enumerate(self.Button_list):
                     if item.above:
                         item.click((idx, running))
-
+                for idx, item in enumerate(self.Area_list):	
+                    if item.above:	
+                        item.click((idx, running))
 class Mode(Display):
     def __init__(self):
         super().__init__()
@@ -355,10 +416,12 @@ class Mode(Display):
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
 
     def next_screen(self, idx, running):
-        if idx == 0:                            
+        if idx == 0:
             self.mode[C.NEXT_SCREEN] = C.STORY
         elif idx == 1:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
+            if Playing.game == None:
+                Playing.game = UnoGame(5)
         elif idx == 2:
             self.mode[C.NEXT_SCREEN] = C.START
     
@@ -378,7 +441,7 @@ class Mode(Display):
                     if item.above:
                         item.click((idx, running))
             elif event.type == pg.KEYUP:
-                for idx, item in enumerate(K.KEY_Settings):
+                for idx, item in enumerate(Data.KEY_Settings):
                     if event.key == item:
                         if idx == 0 or idx == 1: # Up and Left Key
                             if Display.key_idx == 0:
