@@ -1,12 +1,12 @@
 import pygame as pg
 import display as D
 import uno.Constants as C
-import uno.KeySettings as K
+from uno.KeySettings import Data
 
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
-    K.load_settings()
+    Data.load_settings()
     a = D.Start()
     b = D.Setting()
     c = D.Playing()
