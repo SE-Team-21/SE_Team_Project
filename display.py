@@ -118,11 +118,11 @@ class Start(Display):
                                 self.Button_list[Display.key_idx].on_key = False
                                 self.next_screen(Display.key_idx, running)
                                 Display.key_idx = -1
-    pg.mixer.init()                            	
-    pg.mixer.music.load("assets/sounds/bg_music.wav")	
-    pg.mixer.music.play(-1)	
-    pg.mixer.music.load("assets/sounds/bg.wav")	
-    pg.mixer.music.play(-1)
+    #pg.mixer.init()                            	
+    #pg.mixer.music.load("assets/sounds/bg_music.wav")
+    #pg.mixer.music.play(-1)	
+    #pg.mixer.music.load("assets/sounds/bg.wav")
+    #pg.mixer.music.play(-1)
 
 class Setting(Display):
     def __init__(self):
@@ -141,8 +141,8 @@ class Setting(Display):
         self.Button_list.append(Button((680, 250), (120, 30), '2', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((680, 290), (120, 30), '3', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((680, 330), (120, 30), '4', lambda idx, running: self.button_setting(idx, running)))
-        self.Button_list.append(Button((700, 510), (120, 40), 'Default Options', lambda idx, running: self.default_setting(idx, running)))
-        self.Button_list.append(Button((700, 570), (120, 40), 'Back', lambda idx, running: self.next_screen(idx, running)))
+        self.Button_list.append(Button((700, 510), (140, 40), 'Default Options', lambda idx, running: self.default_setting(idx, running)))
+        self.Button_list.append(Button((700, 570), (140, 40), 'Back', lambda idx, running: self.next_screen(idx, running)))
         self.Text_list.append(Text((20, 20), 30, 'DISPLAY', C.WHITE))
         self.Text_list.append(Text((40, 70), 20, 'Resolution', C.WHITE))
         self.Text_list.append(Text((605, 70), 20, '800x600', C.WHITE))
@@ -171,9 +171,30 @@ class Setting(Display):
         self.dragging = False
         self.slider_idx = 0
         self.index = 0
+        self.active = [False, True, False, True, True, True, True, True, True, True, True, True, True, True, True, True]
+
+        # Load Setting
         for i in range(10):
             self.Button_list[i+4].change_text(pg.key.name(Data.data.KEY_Settings[i]))
-        self.active = [False, True, False, True, True, True, True, True, True, True, True, True, True, True, True, True]
+        Display.display_idx = Data.data.Resolution
+        self.Text_list[2].change_text(C.DISPLAY_SIZE_STR[Display.display_idx])
+        if Display.display_idx == 1:
+            self.active[0] = True
+        elif Display.display_idx == 2:
+            self.active[0] = True
+            self.active[1] = False
+        Display.colorblind_idx = Data.data.Color
+        if Display.colorblind_idx == 0 or Display.colorblind_idx == 1:
+            self.active[2] = True
+            self.Text_list[4].change_text(C.COLORBLINDMODE_STR[Display.colorblind_idx])
+        elif Display.colorblind_idx == 2:
+            self.active[2] = True
+            self.active[3] = False
+            self.Text_list[4].change_text(C.COLORBLINDMODE_STR[Display.colorblind_idx])
+        self.Slider_list[0].s = Data.data.Master_Volume
+        self.Slider_list[1].s = Data.data.Music_Volume
+        self.Slider_list[2].s = Data.data.Effect_Volume
+
         
     def next_screen(self, not_use, running):
         if self.mode[C.PREV_SCREEN] == C.START:
@@ -192,9 +213,9 @@ class Setting(Display):
             self.Button_list[i+4].change_text(pg.key.name(Data.data.KEY_Settings[i]))
         Display.display_idx = Data.data.Resolution
         Display.colorblind_idx = Data.data.Color
-        self.Slider_list[0].sound_level = Data.data.Master_Volume
-        self.Slider_list[1].sound_level = Data.data.Music_Volume
-        self.Slider_list[2].sound_level = Data.data.Effect_Volume
+        self.Slider_list[0].s = Data.data.Master_Volume
+        self.Slider_list[1].s = Data.data.Music_Volume
+        self.Slider_list[2].s = Data.data.Effect_Volume
         self.active[0] = False
         self.active[1] = True
         self.active[2] = False
@@ -209,7 +230,8 @@ class Setting(Display):
         pg.draw.line(self.screen, C.WHITE, [int(250*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(165*C.WEIGHT[Display.display_idx])], 3)
         pg.draw.line(self.screen, C.WHITE, [int(140*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], [int(780*C.WEIGHT[Display.display_idx]), int(455*C.WEIGHT[Display.display_idx])], 3)
         for item in self.Slider_list:
-            item.draw(self.screen, Display.display_idx)
+            item.change_size(Display.display_idx)
+            item.draw(self.screen)
         for idx, item in enumerate(self.Button_list):
             if self.active[idx]:
                 item.change_size(Display.display_idx)
@@ -237,6 +259,7 @@ class Setting(Display):
                 self.active[0] = True
         self.screen = pg.display.set_mode(C.DISPLAY_SIZE[Display.display_idx])
         self.Text_list[2].change_text(C.DISPLAY_SIZE_STR[Display.display_idx])
+        Data.save_resolution(Display.display_idx)
         self.key_set = False
 
     def colorblind_control(self, idx, not_use):
@@ -256,6 +279,7 @@ class Setting(Display):
             self.Text_list[4].change_text("    Not Applied")
         else:
             self.Text_list[4].change_text(C.COLORBLINDMODE_STR[Display.colorblind_idx])
+        Data.save_color(Display.colorblind_idx)
         self.key_set = False
 
     def main_loop(self, running):
@@ -267,7 +291,7 @@ class Setting(Display):
                 return
             elif event.type == pg.MOUSEBUTTONDOWN:
                 for idx, item in enumerate(self.Slider_list):
-                    handle_rect = pg.Rect(int(item.slider_x*C.WEIGHT[Display.display_idx]) + int(item.sound_level * item.slider_width*C.WEIGHT[Display.display_idx]), int(item.slider_y*C.WEIGHT[Display.display_idx]) - int(item.slider_height*C.WEIGHT[Display.display_idx]) // 2, int(item.slider_height) * 2, (int(item.slider_height*C.WEIGHT[Display.display_idx]) * 2))
+                    handle_rect = pg.Rect(item.hx, item.hy, item.h, item.h)
                     if handle_rect.collidepoint(event.pos):
                         self.dragging = True
                         self.slider_idx = idx
@@ -279,15 +303,17 @@ class Setting(Display):
                         if(self.key_set):
                             self.key_set = False
             elif event.type == pg.MOUSEBUTTONUP:
-                self.dragging = False
+                if self.dragging:
+                    self.dragging = False
+                    Data.save_sound(self.slider_idx, max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].x) / self.Slider_list[self.slider_idx].w)))
             elif event.type == pg.MOUSEMOTION:
                 if self.dragging:
-                    self.Slider_list[self.slider_idx].sound_level = max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].slider_x) / self.Slider_list[self.slider_idx].slider_width))
-            if(self.key_set):
+                    self.Slider_list[self.slider_idx].s = max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].x) / self.Slider_list[self.slider_idx].w))
+            if self.key_set:
                 if event.type == pg.KEYUP:
                     if event.key not in Data.data.KEY_Settings:
                         self.Button_list[self.index].change_text(pg.key.name(event.key))
-                        Data.data.save_key(self.index-4, event.key)
+                        Data.save_key(self.index-4, event.key)
                         self.key_set = False
                     else:
                         warning = Button((400, 300), (300, 60), 'The key is already in use', color=C.RED)
