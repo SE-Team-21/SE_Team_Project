@@ -4,20 +4,31 @@ import uno.Constants as C
 class Slider:
     def __init__(self, x, y, width, height, sound_level):
         pg.font.init()
-        self.slider_x = x
-        self.slider_y = y
-        self.slider_width = width
-        self.slider_height = height
-        self.sound_level = sound_level
+        self.s = sound_level
+        self.dx = x
+        self.dy = y
+        self.dw = width
+        self.dh = height
+        self.x = x
+        self.y = y
+        self.w = width
+        self.h = height
+        self.hx = self.x + int(self.s * self.w) - self.h//2
+        self.hy = self.y
         self.font = pg.font.SysFont(None, 30)
 
-    def draw(self, screen, weight_idx):
-        self.font = pg.font.SysFont(None, int(30*C.WEIGHT[weight_idx]))
-        pg.draw.rect(screen, (128, 128, 128), (int(self.slider_x*C.WEIGHT[weight_idx]), int(self.slider_y*C.WEIGHT[weight_idx]), int(self.slider_width*C.WEIGHT[weight_idx]), int(self.slider_height*C.WEIGHT[weight_idx])))
-        handle_size = int(self.slider_height*C.WEIGHT[weight_idx])
-        handle_x = int(self.slider_x*C.WEIGHT[weight_idx]) + int(self.sound_level * self.slider_width*C.WEIGHT[weight_idx]) - handle_size/2
-        handle_y = int(self.slider_y*C.WEIGHT[weight_idx])
-        pg.draw.rect(screen, C.WHITE, (handle_x, handle_y, handle_size, handle_size))
-        label = self.font.render("{:.0%}".format(self.sound_level), True, C.WHITE)
-        label_rect = label.get_rect(center=(int(self.slider_x*C.WEIGHT[weight_idx]) - int(40*C.WEIGHT[weight_idx]), int(self.slider_y*C.WEIGHT[weight_idx]) + int(self.slider_height*C.WEIGHT[weight_idx] // 2)))
+    def draw(self, screen):
+        pg.draw.rect(screen, C.GRAY, (self.x, self.y, self.w, self.h))
+        pg.draw.rect(screen, C.WHITE, (self.hx, self.hy, self.h, self.h))
+        label = self.font.render("{:.0%}".format(self.s), True, C.WHITE)
+        label_rect = label.get_rect(center=(self.x - 40, self.y + self.h // 2))
         screen.blit(label, label_rect)
+    
+    def change_size(self, idx):
+        self.font = pg.font.SysFont(None, 30)
+        self.x = int(self.dx * C.WEIGHT[idx])
+        self.y = int(self.dy * C.WEIGHT[idx])
+        self.w = int(self.dw * C.WEIGHT[idx])
+        self.h = int(self.dh * C.WEIGHT[idx])
+        self.hx = self.x + int(self.s * self.w) - self.h//2
+        self.hy = self.y
