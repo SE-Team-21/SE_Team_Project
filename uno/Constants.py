@@ -4,9 +4,10 @@ from uno.CardButton_Class import CardButton
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
-blue = (0, 0, 255)
+BLUE = (0, 0, 255)
 YELLOW = (255, 211, 67)
 GREEN = (0, 255, 0)
+GRAY = (128, 128, 128)
 ABOVE_COLOR = (234, 236, 240)
 INACTIVE_COLOR = (215, 215, 215)
 
