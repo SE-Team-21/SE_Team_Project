@@ -340,7 +340,6 @@ class Playing(Display):
         '''
 # here ===================================================
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
-        super().update_screen(mouse_pos)
         for item in self.Card_list:
             item.update(mouse_pos)
 
@@ -349,7 +348,7 @@ class Playing(Display):
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
-        #self.Card_list = []
+        self.Card_list = []
         # for i in Playing.game.players[0].hand:
             # self.Card_list.append(CardButton())
             # print(i.color, i.card_type)
@@ -362,26 +361,22 @@ class Playing(Display):
         self.screen.blit(self.top.img, (150,100))
         self.backCard = C.ALL_CARDS["Back"]
         self.screen.blit(self.backCard.img, (100, 100))
-
+        '''
         self.x_ = 0
         self.y_ = 0
         for player in Playing.game.players:
             self.screen.blit(self.backCard.img, (self.x_, self.y_))
             self.y_ = self.y_ + 100
-
-
+        '''
         for i in Playing.game.players[0].hand:
-            
             myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
-            myCard.function = lambda: print(myCard.card_color)
+            self.Card_list.append(myCard)
             '''
             if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
                 self.Card_list.append(myCard)
                 self.screen.blit(myCard.img, (self.x, self.y))
             self.x += 50
             '''
-            
-            self.Card_list.append(C.ALL_CARDS[str(i.color) + str(i.card_type)])
             myCard.draw(self.screen, self.x, self.y)
             self.x += 50
         self.update_screen(pg.mouse.get_pos())
@@ -397,6 +392,7 @@ class Playing(Display):
                 for idx, item in enumerate(self.Card_list):
                     if item.above:
                         item.click()
+                        break
 
 class Pause(Display):
     def __init__(self):

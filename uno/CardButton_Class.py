@@ -6,14 +6,10 @@ class CardButton:
         #self.default_pos = pos
         #self.pos = pos
         #self.size = size
-        pg.font.init()
-        self.FONT = pg.font.SysFont(C.FONT, C.DEFAULT_SIZE)
-        self.text = self.FONT.render('', True, C.WHITE)
-
-        self.color = C.INACTIVE_COLOR
         self.function = function
         self.above = False
         self.on_key = False
+        self.rect = pg.Rect(0, 0, 0, 0)
         self.img = pg.transform.scale(pg.image.load("./assets/images/"+ card_name + ".png"), (45,90))
         self.card_color = card_color
         self.card_type = card_type
@@ -25,21 +21,17 @@ class CardButton:
             self.above = False
 
     def draw(self, screen, x, y):
-        # pg.draw.rect(screen, self.color, self.rect)
-        self.text_rect = self.text.get_rect(center=(x,y))
-        self.rect = pg.Rect(0, 0, 45, 90)
-        self.rect.center = (x,y)
-        pg.draw.rect(screen, C.WHITE, self.rect)
-        screen.blit(self.text, self.text_rect)
+        self.rect = pg.Rect(x, y, 45, 90)
         screen.blit(self.img, (x,y))
 
     def click(self, params = None):
-        if self.function:
+        print(self.card_color + self.card_type)
+        '''if self.function:
             if params:
                 self.function(*params)
             else:
                 self.function()
-'''
+
     def change_size(self, weight_idx):
         self.FONT = pg.font.SysFont(C.FONT, int(C.DEFAULT_SIZE*C.WEIGHT[weight_idx]))
         self.rect = pg.Rect(0, 0, *tuple(int(item*C.WEIGHT[weight_idx]) for item in self.size))
