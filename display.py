@@ -413,6 +413,7 @@ class Pause(Display):
             self.mode[C.PREV_SCREEN] = C.STOP
         elif idx==2:
             self.mode[C.NEXT_SCREEN] = C.START
+            Playing.game = None
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
@@ -437,20 +438,23 @@ class Story(Display):
         self.Button_list.append(Button((400, 500), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_map.png"), C.DISPLAY_SIZE[Display.display_idx])
         self.cloudimg = pg.transform.scale(pg.image.load("./assets/images/cloud.png"), (int(444*C.WEIGHT[Display.display_idx]), int(300*C.WEIGHT[Display.display_idx])))
-        
+        self.active = [True, False, False, False]
+
     def next_screen(self, idx, running):
         if idx==0:
             self.mode[C.NEXT_SCREEN] = C.START
 
-    def next_screen_2(self, idx, running):	
-        if idx==0:	
-            self.mode[C.NEXT_SCREEN] = C.PLAYING    	
-        if idx==1:	
-            self.mode[C.NEXT_SCREEN] = C.PLAYING	
-        if idx==2:	
-            self.mode[C.NEXT_SCREEN] = C.PLAYING	
-        if idx==3:	
-            self.mode[C.NEXT_SCREEN] = C.PLAYING	
+    def next_screen_2(self, idx, running):
+        if Playing.game == None:
+                Playing.game = UnoGame(5)
+        if idx==0:
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
+        if idx==1:
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
+        if idx==2:
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
+        if idx==3:
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
 
     def update_area(self, mouse_pos):	
         for item in self.Area_list:	
