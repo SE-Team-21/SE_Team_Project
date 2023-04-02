@@ -1,5 +1,11 @@
 import pygame as pg
-import display as D
+from uno.display import Display
+from uno.start import Start
+from uno.setting import Setting
+from uno.pause import Pause
+from uno.story import Story
+from uno.mode import Mode
+from uno.play import Playing
 import uno.Constants as C
 from uno.KeySettings import Data
 
@@ -8,26 +14,10 @@ def uno_mainloop():
     pg.display.set_caption("UNO Game") # 실행 창 제목
     Data.load_settings()
     pg.time.Clock().tick(60)
-    a = D.Start()
-    b = D.Setting()
-    c = D.Playing()
-    d = D.Pause()
-    e = D.Mode()
-    f = D.Story()
+    Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story()]
     running = [True]
     while running[0]:
-        if D.Display.mode[C.NEXT_SCREEN] == C.START:
-            a.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.SETTING:
-            b.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.PLAYING:
-            c.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.STOP:
-            d.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.MODE:
-            e.main_loop(running)
-        elif D.Display.mode[C.NEXT_SCREEN] == C.STORY:
-            f.main_loop(running)
+        Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
     pg.quit()
 
 if __name__ == "__main__":
