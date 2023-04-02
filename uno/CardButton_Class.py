@@ -26,6 +26,7 @@ class CardButton:
 
     def click(self, params = None):
         print(self.card_color + self.card_type)
+        
         '''if self.function:
             if params:
                 self.function(*params)
