@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from uno.CardButton_Class import CardButton
 from uno.game.Game import UnoGame
-from uno.Music import Background_Music as bm
+from uno.Music import Background_Music as bgm
 
 class Display(metaclass=ABCMeta):
     # Static Variable
@@ -49,6 +49,11 @@ class Display(metaclass=ABCMeta):
         if Display.colorblind_idx != -1:
             self.color()
         pg.display.update()
+
+    #def background_music(self, display_idx):
+        #bgm1 = bgm(self, display_idx)
+        #bgm1.play()
+
 
     @abstractmethod
     def next_screen(self): # 버튼 클릭시 다음 화면으로 전환
@@ -118,11 +123,8 @@ class Start(Display):
                                 self.Button_list[Display.key_idx].on_key = False
                                 self.next_screen(Display.key_idx, running)
                                 Display.key_idx = -1
-    #pg.mixer.init()                            	
-    #pg.mixer.music.load("assets/sounds/bg_music.wav")
-    #pg.mixer.music.play(-1)	
-    #pg.mixer.music.load("assets/sounds/bg.wav")
-    #pg.mixer.music.play(-1)
+                
+    
 
 class Setting(Display):
     def __init__(self):
@@ -330,23 +332,46 @@ class Playing(Display):
         self.Card_list = []
         self.x = 0
         self.y = 0
-
+        self.num_of_players = 0
+        self.is_game_start = False
+        self.is_computer_activated = [False, False, False, False, False]
         # self.Card_list.append(CardButton((10,10), (60,120)))
-        
-            
+        self.Player_list = []
+        self.Player_list.append(Button((600, 100), (80, 80), 'Player0 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((600, 200), (80, 80), 'Player1 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((600, 300), (80, 80), 'Player2 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((600, 400), (80, 80), 'Player3 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((600, 500), (80, 80), 'Player4 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
         '''
         self.Text_list.append(Text((220, 60), 40, 'Playing Display'))
         self.Text_list.append(Text((220, 120), 40, 'Press ESC to PAUSE Menu'))
         '''
 # here ===================================================
+    def computer_add_remove(self, idx, item):
+        if self.is_computer_activated[idx]:
+            self.is_computer_activated[idx] = False
+            self.num_of_players -= 1
+        else:
+            self.is_computer_activated[idx] = True
+            self.num_of_players += 1
+        print(idx, item, self.num_of_players)
+
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
         for item in self.Card_list:
             item.update(mouse_pos)
-
+        for item in self.Player_list:
+            item.update(mouse_pos)
+        self.start_button.update(mouse_pos)
+        
     def next_screen(self):
         pass
+    
+    def game_start(self):
+        self.is_game_start = True
 
     def main_loop(self, running):
+        # # game inst
         self.screen.fill((255, 255, 255))
         self.Card_list = []
         # for i in Playing.game.players[0].hand:
@@ -357,10 +382,17 @@ class Playing(Display):
         self.x = 0
         self.y = 300
         #self.update_screen(pg.mouse.get_pos())
-        self.top = C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)]
-        self.screen.blit(self.top.img, (150,100))
-        self.backCard = C.ALL_CARDS["Back"]
-        self.screen.blit(self.backCard.img, (100, 100))
+
+        for idx, item in enumerate(self.Player_list):
+            if self.is_computer_activated[idx]:
+                item.change_text(item.button_text.replace(" ", "_activated"))
+                item.draw(self.screen)
+            else:
+                item.change_text(item.button_text.replace("_activated", " "))
+                item.draw(self.screen)
+        self.start_button.draw(self.screen)
+
+
         '''
         self.x_ = 0
         self.y_ = 0
@@ -368,17 +400,24 @@ class Playing(Display):
             self.screen.blit(self.backCard.img, (self.x_, self.y_))
             self.y_ = self.y_ + 100
         '''
-        for i in Playing.game.players[0].hand:
-            myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
-            self.Card_list.append(myCard)
-            '''
-            if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
+        if self.is_game_start:
+            if Playing.game == None:
+                Playing.game = UnoGame(self.num_of_players)
+            self.top = C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)]
+            for i in Playing.game.players[0].hand:
+                myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
                 self.Card_list.append(myCard)
-                self.screen.blit(myCard.img, (self.x, self.y))
-            self.x += 50
-            '''
-            myCard.draw(self.screen, self.x, self.y)
-            self.x += 50
+                '''
+                    if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
+                        self.Card_list.append(myCard)
+                        self.screen.blit(myCard.img, (self.x, self.y))
+                    self.x += 50
+                '''
+                myCard.draw(self.screen, self.x, self.y)
+                self.x += 50
+                self.screen.blit(self.top.img, (150,100))
+                self.backCard = C.ALL_CARDS["Back"]
+                self.screen.blit(self.backCard.img, (100, 100))
         self.update_screen(pg.mouse.get_pos())
         pg.display.update()
         for event in pg.event.get():
@@ -389,10 +428,16 @@ class Playing(Display):
                 if event.key == pg.K_ESCAPE:
                     self.mode[C.NEXT_SCREEN] = C.STOP
             elif event.type == pg.MOUSEBUTTONDOWN:
-                for idx, item in enumerate(self.Card_list):
+                if Playing.game:
+                    for idx, item in enumerate(self.Card_list):
+                        if item.above:
+                            item.click()
+                            break
+                for idx, item in enumerate(self.Player_list):
                     if item.above:
-                        item.click()
-                        break
+                        item.click((idx, item))
+                if self.start_button.above:
+                    self.start_button.click()
 
 class Pause(Display):
     def __init__(self):
@@ -442,7 +487,7 @@ class Story(Display):
 
     def next_screen_2(self, idx, running):
         if Playing.game == None:
-                Playing.game = UnoGame(5)
+                Playing.game = UnoGame(5) # game inst
         if idx==0:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
         if idx==1:
@@ -491,8 +536,6 @@ class Mode(Display):
             self.mode[C.NEXT_SCREEN] = C.STORY
         elif idx == 1:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
-            if Playing.game == None:
-                Playing.game = UnoGame(5)
         elif idx == 2:
             self.mode[C.NEXT_SCREEN] = C.START
     
