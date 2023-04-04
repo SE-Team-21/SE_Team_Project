@@ -4,6 +4,7 @@ import pygame as pg
 from uno.Button_Class import Button
 from uno.game.Game import UnoGame
 import random
+from uno.CardButton_Class import CardButton
 
 class Playing(Display):
     game = None
@@ -74,9 +75,9 @@ class Playing(Display):
     def game_handler(self, running):
         if Playing.game == None:
             Playing.game = UnoGame(self.num_of_players)
-        self.top = C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)]
+        self.top = CardButton(str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type), C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)])
         for i in Playing.game.players[0].hand:
-            myCard = C.ALL_CARDS[str(i.color) + str(i.card_type)]
+            myCard = CardButton(str(i.color) + str(i.card_type), C.ALL_CARDS[str(i.color) + str(i.card_type)])
             self.Card_list.append(myCard)
             '''
                 if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
@@ -86,9 +87,9 @@ class Playing(Display):
             '''
             myCard.draw(self.screen, self.x, self.y)
             self.x += 50
-            self.screen.blit(self.top.img, (150,100))
-            self.backCard = C.ALL_CARDS["Back"]
-            self.screen.blit(self.backCard.img, (100, 100))
+            self.top.draw(self.screen, 150, 100)
+            self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
+            self.backCard.draw(self.screen, 100, 100)
 
             player = self.game.current_player
             player_id = player.player_id
