@@ -3,6 +3,7 @@ import uno.Constants as C
 import pygame as pg
 from uno.Button_Class import Button
 from uno.game.Game import UnoGame
+from uno.Text_Class import Text
 import random
 from uno.CardButton_Class import CardButton
 
@@ -19,11 +20,16 @@ class Playing(Display):
         self.is_game_start = False
         self.is_computer_activated = [False, False, False, False, False]
         self.Player_list = []
-        self.Player_list.append(Button((600, 100), (80, 80), 'Computer1 ', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((600, 200), (80, 80), 'Computer2 ', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((600, 300), (80, 80), 'Computer3 ', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((600, 400), (80, 80), 'Computer4 ', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((600, 500), (80, 80), 'Computer5 ', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 60), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 178), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 296), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 414), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 532), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Text_list.append(Text((690, 60), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 178), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 296), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 414), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 532), 20, '', C.BLACK))
         self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
 
         self.choice_card_idx = None
@@ -37,9 +43,19 @@ class Playing(Display):
             self.num_of_players += 1
 
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
-        for item in self.Card_list:
+        for idx, item in enumerate(self.Player_list):
+            if self.is_computer_activated[idx]:
+                item.INACTIVE_COLOR = C.GRAY
+                item.locate = True
+                item.change_text('Computer'+str(idx+1))
+            else:
+                item.INACTIVE_COLOR = C.WHITE
+                item.locate = False
+                item.change_text('empty')
             item.update(mouse_pos)
-        for item in self.Player_list:
+            item.draw(self.screen)
+            item.change_size(Display.display_idx)
+        for item in self.Card_list:
             item.update(mouse_pos)
         self.start_button.update(mouse_pos)
         
@@ -87,6 +103,9 @@ class Playing(Display):
             '''
             myCard.draw(self.screen, self.x, self.y)
             self.x += 50
+            if self.x >= 500:
+                self.x = 0
+                self.y += 100
             self.top.draw(self.screen, 150, 100)
             self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
             self.backCard.draw(self.screen, 100, 100)
@@ -113,6 +132,7 @@ class Playing(Display):
 
     def single_mode(self, running):
         self.screen.fill((255, 255, 255))
+        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
         self.Card_list = []
         self.x = 0
         self.y = 300
@@ -122,22 +142,20 @@ class Playing(Display):
         else:
             self.start_button.draw(self.screen)
 
-        for idx, item in enumerate(self.Player_list):
-            if self.is_computer_activated[idx]:
-                item.change_text(item.button_text.replace(" ", "_activated"))
-                item.draw(self.screen)
-            else:
-                item.change_text(item.button_text.replace("_activated", " "))
-                item.draw(self.screen)
-        '''
-        self.x_ = 0
-        self.y_ = 0
-        for player in Playing.game.players:
-            self.screen.blit(self.backCard.img, (self.x_, self.y_))
-            self.y_ = self.y_ + 100
-        '''
-            
         self.update_screen(pg.mouse.get_pos())
+        
+        if self.is_game_start:
+            x_ = 640
+            y_ = 40
+            index = 0
+            for idx in range(5):
+                if self.is_computer_activated[idx]:
+                    self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (x_, y_))
+                    self.Text_list[idx].change_text('+' + str(len(Playing.game.players[index].hand)-1))
+                    self.Text_list[idx].draw(self.screen)
+                    index += 1
+                y_ += 118
+            
         pg.display.update()
         for event in pg.event.get():
             self.tmp_event = event
