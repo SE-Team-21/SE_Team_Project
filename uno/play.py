@@ -106,29 +106,30 @@ class Playing(Display):
             if self.x >= 500:
                 self.x = 0
                 self.y += 100
-            self.top.draw(self.screen, 150, 100)
-            self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
-            self.backCard.draw(self.screen, 100, 100)
+        self.top.draw(self.screen, 150, 100)
+        self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
+        self.backCard.draw(self.screen, 100, 100)
 
-            player = self.game.current_player
-            player_id = player.player_id
-            if player_id == 0:
-                self.player_action(running)
+        player = self.game.current_player
+        player_id = player.player_id
+        if player_id == 0:
+            self.player_action(running)
+        else:
+            if player.can_play(self.game.current_card):
+                for i, card in enumerate(player.hand):
+                    if self.game.current_card.playable(card):
+                        if card.color == 'black':
+                            new_color = random.choice(C.COLORS)
+                        else:
+                            new_color = None
+                        print("Computer {} played {}".format(player, card))
+                        self.game.play(player=player_id, card=i, new_color=new_color)
+                        pg.time.wait(500)
+                        break
             else:
-                if player.can_play(self.game.current_card):
-                    for i, card in enumerate(player.hand):
-                        if self.game.current_card.playable(card):
-                            if card.color == 'black':
-                                new_color = random.choice(C.COLORS)
-                            else:
-                                new_color = None
-                            print("Computer {} played {}".format(player, card))
-                            self.game.play(player=player_id, card=i, new_color=new_color)
-                            break
-                else:
-                    print("Computer {} picked up".format(player))
-                    self.game.play(player=player_id, card=None)
-                    pg.time.wait(200)
+                print("Computer {} picked up".format(player))
+                self.game.play(player=player_id, card=None)
+                pg.time.wait(500)
 
     def single_mode(self, running):
         self.screen.fill((255, 255, 255))
@@ -155,8 +156,26 @@ class Playing(Display):
                     self.Text_list[idx].draw(self.screen)
                     index += 1
                 y_ += 118
-            
-        pg.display.update()
+
+            if self.game.current_card.color == 'red': # 현재 색깔 표시
+                pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
+            elif self.game.current_card.color == 'green':
+                pg.draw.rect(self.screen, C.GREEN, (100, 50, 50, 50))
+            elif self.game.current_card.color == 'yellow':
+                pg.draw.rect(self.screen, C.YELLOW, (100, 50, 50, 50))
+            elif self.game.current_card.color == 'blue':
+                pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
+            elif self.game.current_card.color == 'black':
+                if self.game.current_card.temp_color == 'red':
+                    pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
+                elif self.game.current_card.temp_color == 'green':
+                    pg.draw.rect(self.screen, C.GREEN, (100, 50, 50, 50))
+                elif self.game.current_card.temp_color == 'yellow':
+                    pg.draw.rect(self.screen, C.YELLOW, (100, 50, 50, 50))
+                elif self.game.current_card.temp_color == 'blue':
+                    pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
+
+        pg.display.update()    
         for event in pg.event.get():
             self.tmp_event = event
             if event.type == pg.QUIT:
@@ -176,7 +195,7 @@ class Playing(Display):
                     if Playing.game:
                         for idx, item in enumerate(self.Card_list):
                             if item.above:
-                                print(idx)
+                                print(item.card_name)
                                 self.choice_card_idx = idx
                                 break
                 for idx, item in enumerate(self.Player_list):
