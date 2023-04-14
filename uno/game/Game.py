@@ -164,10 +164,12 @@ class UnoGame:
         print("Player {} wins!".format(winner_name))
 
     def _pick_up(self, player, n):
+        player.uno_state = False
         if self.probability == -1:
             penalty_cards = [self.deck.pop(0) for i in range(n)]
             player.hand.extend(penalty_cards)
         else:
             penalty_cards = self._deal_prob(self.init_deal_cnt)
             player.hand.extend(penalty_cards)
+            
 

@@ -5,6 +5,7 @@ from uno.KeySettings import Data
 from uno.Button_Class import Button
 from uno.Text_Class import Text
 from uno.Slider_Class import Slider
+import uno.Music as Music
 
 class Setting(Display):
     def __init__(self):
@@ -163,6 +164,18 @@ class Setting(Display):
             self.Text_list[4].change_text(C.COLORBLINDMODE_STR[Display.colorblind_idx])
         Data.save_color(Display.colorblind_idx)
         self.key_set = False
+        
+    def volume_control(self, idx, v):
+        print(v)
+        if idx == 0:
+            #v = Data.data.Master_Volume
+            Music.master_volume(v)
+        if idx == 1:
+            #v = Data.data.Music_Volume
+            Music.bg_volume(v)
+        if idx == 2:
+            #v = Data.data.Music_volume
+            Music.ef_volume(v)
 
     def main_loop(self, running):
         self.screen.fill((0, 0, 0))
@@ -188,6 +201,7 @@ class Setting(Display):
                 if self.dragging:
                     self.dragging = False
                     Data.save_sound(self.slider_idx, max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].x) / self.Slider_list[self.slider_idx].w)))
+                    self.volume_control(self.slider_idx, max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].x) / self.Slider_list[self.slider_idx].w)))
             elif event.type == pg.MOUSEMOTION:
                 if self.dragging:
                     self.Slider_list[self.slider_idx].s = max(0, min(1, (event.pos[0] - self.Slider_list[self.slider_idx].x) / self.Slider_list[self.slider_idx].w))

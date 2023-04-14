@@ -34,12 +34,56 @@ class Playing(Display):
         self.Text_list.append(Text((690, 414), 20, '', C.BLACK))
         self.Text_list.append(Text((690, 532), 20, '', C.BLACK))
         self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
-        
-        
+        self.Color_list = []
+        self.Color_list.append(Button((380, 120), (40, 40), 'RED', lambda x: self.choice_color(x)))
+        self.Color_list.append(Button((420, 120), (40, 40), 'YELLOW', lambda x: self.choice_color(x)))
+        self.Color_list.append(Button((380, 160), (40, 40), 'GREEN', lambda x: self.choice_color(x)))
+        self.Color_list.append(Button((420, 160), (40, 40), 'BLUE', lambda x: self.choice_color(x)))
+        self.Color_list[0].INACTIVE_COLOR = C.RED
+        self.Color_list[1].INACTIVE_COLOR = C.YELLOW
+        self.Color_list[2].INACTIVE_COLOR = C.GREEN
+        self.Color_list[3].INACTIVE_COLOR = C.BLUE
+        self.Uno_Button = Button((120, 220), (40, 40), 'UNO', lambda x: self.click_uno(x))
+        self.Color_active = False
+        self.Color_idx = None
+        self.is_color_choice = False
         self.Timer = Text((240, 120), 20, '', C.BLACK)
-        
         self.choice_card_idx = None
+    '''
+    아무나 카드가 한 장일 때, 누구든 누를 수 있음.
+        나보다 상대가 먼저 눌렀으면 카드 뽑기.
+    그 한장에 대해 우노를 안누른 상태라면 낼 수 없음.
 
+    내 턴에 2장이었다가 한장 내고 우노를 누름
+    1. 상대 턴 돌면서 나한테 카드 먹여서 2장이 넘어감
+    2. 내 턴 다시 돌아왔는데 낼 카드가 없어서 드로우 -> 2장이 됨
+    
+    1. 마지막 한장  카드를 내려면, 우노를 누른 상태여야만 함.
+        우노 누른 상태
+
+
+    '''
+
+
+    def click_uno(self, who):
+        print("click uno button, player ", who)
+        valid = 0
+        game = Playing.game
+        for player in game.players:
+            if (len(player.hand) == 1):
+                valid += 1
+                
+        if valid:
+            if self.game.current_player.player_id != who: # who가 아닌 사람이 uno일 때 who가 누른 경우
+                self.game._pick_up(self.game.current_player, 1)
+            else: # 내꺼 내가누름
+                self.game.current_player.uno_state = True
+        else: 
+            pass
+
+    def choice_color(self, n):
+        self.Color_idx = n
+        
     def computer_add_remove(self, idx, item):
         if self.is_computer_activated[idx]:
             self.is_computer_activated[idx] = False
@@ -66,6 +110,7 @@ class Playing(Display):
         for item in self.Card_list:
             item.update(mouse_pos)
         self.start_button.update(mouse_pos)
+        self.Uno_Button.update(mouse_pos)
         
     def next_screen(self):
         pass
@@ -79,17 +124,31 @@ class Playing(Display):
         if player.can_play(self.game.current_card):
             
             # if self.top.card_color == myCard.card_color or self.top.card_type == myCard.card_type or myCard.card_color == "black":
-            if self.choice_card_idx is not None:
-                card = Playing.game.players[0].hand[self.choice_card_idx]
-                if self.game.current_card.playable(card):
-                    if card.color == 'black':
-                        new_color = random.choice(C.COLORS)
-                    else:
-                        new_color = None
-                    print("Player {} played {}".format(player, card))
-                    self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
-                    self.time = 1800
+            if  self.is_color_choice and self.Color_idx != None:                           
+                new_color = C.COLORS[self.Color_idx]
+                self.Color_active = False
+                self.Color_idx = None
+                #print("Player {} played {}".format(player, card))
+                self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
+                self.time = 1800
+                self.is_color_choice = False
                 self.choice_card_idx = None
+                
+            if self.choice_card_idx is not None:
+                if len(player.hand) > 1 or (len(player.hand) == 1 and player.uno_state):
+                    card = Playing.game.players[0].hand[self.choice_card_idx]
+                    if self.game.current_card.playable(card):
+                        if card.color == 'black':
+                            if self.Color_idx == None:
+                                self.Color_active = True
+                                self.is_color_choice = True
+
+                        else:
+                            new_color = None
+                            print("Player {} played {}".format(player, card))
+                            self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
+                            self.choice_card_idx = None
+                            self.time = 1800
         
         else:
             print("Player {} picked up".format(player))
@@ -97,10 +156,12 @@ class Playing(Display):
             pg.time.wait(200)
             self.time = 1800
 
-    def game_handler(self, running):
+
+    def game_handler(self, running): # main
         if Playing.game == None:
             Playing.game = UnoGame(self.num_of_players)
-        self.top = CardButton(str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type), C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)])
+        self.top = CardButton(str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type), 
+                              C.ALL_CARDS[str(Playing.game.current_card.color) + str(Playing.game.current_card.card_type)])
         for i in Playing.game.players[0].hand:
             myCard = CardButton(str(i.color) + str(i.card_type), C.ALL_CARDS[str(i.color) + str(i.card_type)])
             self.Card_list.append(myCard)
@@ -116,30 +177,36 @@ class Playing(Display):
 
         player = self.game.current_player
         player_id = player.player_id
-        if player_id == 0:
+        if player_id == 0: # 나
             self.player_action(running)
-        else:
+        else: # ai
             if player.can_play(self.game.current_card):
-                for i, card in enumerate(player.hand):
-                    if self.game.current_card.playable(card):
-                        if card.color == 'black':
-                            new_color = random.choice(C.COLORS)
-                        else:
-                            new_color = None
-                        print("Computer {} played {}".format(player, card))
-                        self.game.play(player=player_id, card=i, new_color=new_color)
-                        self.time = 1800
-                        pg.time.wait(500)
-                        break
+                # 30 - random 
+                if 1800 - self.time < 60*random.uniform(0.1, 0.2):
+                    pass
+                else:
+                    if len(player.hand) == 1:
+                        self.click_uno(player_id)
+                    for i, card in enumerate(player.hand):
+                        if self.game.current_card.playable(card):
+                            if len(player.hand) > 1 or (len(player.hand) == 1 and player.uno_state):
+                                if card.color == 'black':
+                                    new_color = random.choice(C.COLORS)
+                                else:
+                                    new_color = None
+                                print("Computer {} played {}".format(player, card))
+                                self.game.play(player=player_id, card=i, new_color=new_color)
+                                self.time = 1800
+                                break
             else:
                 print("Computer {} picked up".format(player))
                 self.game.play(player=player_id, card=None)
                 self.time = 1800
-                pg.time.wait(500)
 
     def single_mode(self, running):
         self.screen.fill((255, 255, 255))
-        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
+        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
+                                            int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
         self.Card_list = []
         self.x = 0
         self.y = 300
@@ -176,7 +243,7 @@ class Playing(Display):
             for idx in range(5):
                 if self.is_computer_activated[idx]:
                     self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (x_, y_))
-                    self.Text_list[idx].change_text('+' + str(len(Playing.game.players[index].hand)-1))
+                    self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
                     self.Text_list[idx].draw(self.screen)
                     index += 1
                 y_ += 118
@@ -199,7 +266,15 @@ class Playing(Display):
                 elif self.game.current_card.temp_color == 'blue':
                     pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
 
-        pg.display.update()    
+        if self.is_game_start:
+            self.Uno_Button.draw(self.screen)
+            self.Card_list[self.key_locate].on_key = True
+
+        if self.Color_active:
+            for item in self.Color_list:
+                item.update(pg.mouse.get_pos())
+                item.draw(self.screen)
+
         for event in pg.event.get():
             self.tmp_event = event
             if event.type == pg.QUIT:
@@ -209,7 +284,7 @@ class Playing(Display):
                 for idx, item in enumerate(Data.data.KEY_Settings):
                     if event.key == item:
                         if idx == 0: # up
-                            if self.key_loate-10 >= 0:
+                            if self.key_locate-10 >= 0:
                                 self.Card_list[self.key_locate].on_key = False
                                 self.key_locate -= 10
                                 self.Card_list[self.key_locate].on_key = True
@@ -229,17 +304,28 @@ class Playing(Display):
                                 self.key_locate += 1
                                 self.Card_list[self.key_locate].on_key = True
                         elif idx == 4: # return
-                            pass
+                            if self.game.current_card.playable(Playing.game.players[0].hand[self.key_locate]):
+                                '''if "black" in self.Card_list[self.key_locate].card_name:
+                                    new_color = random.choice(C.COLORS)
+                                else:
+                                    new_color = None
+                                self.game.play(player=0, card=self.key_locate, new_color=new_color)'''
+                                self.choice_card_idx = self.key_locate
+                                self.key_locate = 0
                         elif idx == 5: # escape
                             self.mode[C.NEXT_SCREEN] = C.STOP
-                        elif idx == 6:
-                            pass
-                        elif idx == 7:
-                            pass
-                        elif idx == 8:
-                            pass
-                        elif idx == 9:
-                            pass
+                        else:
+                            if self.Color_active:
+                                if idx == 6:
+                                    self.Color_idx = 0
+                                elif idx == 7:
+                                    self.Color_idx = 1
+                                elif idx == 8:
+                                    self.Color_idx = 2
+                                elif idx == 9:
+                                    self.Color_idx = 3
+                                print(self.Color_idx)
+                                self.Color_active = False
 
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if self.tmp_event.type == pg.QUIT:
@@ -250,11 +336,20 @@ class Playing(Display):
                         self.mode[C.NEXT_SCREEN] = C.STOP
                 elif self.tmp_event.type == pg.MOUSEBUTTONDOWN:
                     if Playing.game:
-                        for idx, item in enumerate(self.Card_list):
-                            if item.above:
-                                print(item.card_name)
-                                self.choice_card_idx = idx
-                                break
+                        if self.Color_active:
+                            print(2)
+                            for idx, item in enumerate(self.Color_list):
+                                if item.above:
+                                    self.Color_idx = idx
+                        else:
+                            for idx, item in enumerate(self.Card_list):
+                                if item.above:
+                                    print(item.card_name)
+                                    self.choice_card_idx = idx
+                                    break
+                            if self.Uno_Button.above:
+                                self.Uno_Button.click((0, ))
+
                 for idx, item in enumerate(self.Player_list):
                     if item.above and not self.is_game_start:
                         item.click((idx, item))

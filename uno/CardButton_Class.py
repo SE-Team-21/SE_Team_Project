@@ -23,7 +23,6 @@ class CardButton:
         self.rect = pg.Rect(x, y, 45, 90)
         screen.blit(self.img, (x,y))
         if self.above or self.on_key:
-            print(x, y)
             pg.draw.rect(screen, (191,255,0), [x, y, 45, 90], 3)
 
     def click(self, params = None):

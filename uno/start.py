@@ -3,6 +3,7 @@ import uno.Constants as C
 import pygame as pg
 from uno.KeySettings import Data
 from uno.Button_Class import Button
+import uno.Music as Music
 
 class Start(Display):
     def __init__(self):
@@ -11,6 +12,7 @@ class Start(Display):
         self.Button_list.append(Button((100, 300), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((100, 450), (120, 60), 'Quit', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
+        Music.Background_Music(0).play()
 
     def next_screen(self, idx, running):
         if idx == 0:                            
@@ -64,3 +66,5 @@ class Start(Display):
                                 self.Button_list[Display.key_idx].on_key = False
                                 self.next_screen(Display.key_idx, running)
                                 Display.key_idx = -1
+                if event.key not in Data.data.KEY_Settings:
+                    print("error")

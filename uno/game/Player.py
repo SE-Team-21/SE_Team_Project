@@ -8,6 +8,7 @@ class UnoPlayer:
             )
         self.hand = cards
         self.player_id = player_id
+        self.uno_state = False
 
     def __repr__(self):
         if self.player_id is not None:
