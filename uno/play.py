@@ -10,18 +10,39 @@ from uno.KeySettings import Data
 
 class Playing(Display):
     game = None
+    is_game_start = False
     game_mode = 0
+    is_computer_activated = [False, False, False, False, False]
+    num_of_players = 1
+    Color_active = False
+    Color_idx = None
+    is_color_choice = False
+    choice_card_idx = None
+    time = 1800
+    key_locate = 0
+    x = 0
+    y = 0
+
+    @staticmethod
+    def reset():
+        Playing.game = None
+        Playing.is_game_start = False
+        Playing.game_mode = 0
+        Playing.is_computer_activated = [False, False, False, False, False]
+        Playing.num_of_players = 1
+        Playing.Color_active = False
+        Playing.Color_idx = None
+        Playing.is_color_choice = False
+        Playing.choice_card_idx = None
+        Playing.time = 1800
+        Playing.key_locate = 0
+        Playing.x = 0
+        Playing.y = 0
+        
     def __init__(self):
         super().__init__()
         self.Card_list = []
-        self.time = 1800
-        self.key_locate = 0
-        self.x = 0
-        self.y = 0
         self.stage = 0
-        self.num_of_players = 1
-        self.is_game_start = False
-        self.is_computer_activated = [False, False, False, False, False]
         self.Player_list = []
         self.Player_list.append(Button((710, 60), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
         self.Player_list.append(Button((710, 178), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
@@ -44,11 +65,7 @@ class Playing(Display):
         self.Color_list[2].INACTIVE_COLOR = C.GREEN
         self.Color_list[3].INACTIVE_COLOR = C.BLUE
         self.Uno_Button = Button((120, 220), (40, 40), 'UNO', lambda x: self.click_uno(x))
-        self.Color_active = False
-        self.Color_idx = None
-        self.is_color_choice = False
         self.Timer = Text((240, 120), 20, '', C.BLACK)
-        self.choice_card_idx = None
     '''
     아무나 카드가 한 장일 때, 누구든 누를 수 있음.
         나보다 상대가 먼저 눌렀으면 카드 뽑기.
@@ -63,7 +80,6 @@ class Playing(Display):
 
 
     '''
-
 
     def click_uno(self, who):
         print("click uno button, player ", who)
