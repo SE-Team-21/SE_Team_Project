@@ -6,6 +6,7 @@ from uno.game.Game import UnoGame
 from uno.Text_Class import Text
 import random
 from uno.CardButton_Class import CardButton
+from uno.KeySettings import Data
 
 class Playing(Display):
     game = None
@@ -13,6 +14,8 @@ class Playing(Display):
     def __init__(self):
         super().__init__()
         self.Card_list = []
+        self.time = 1800
+        self.key_locate = 0
         self.x = 0
         self.y = 0
         self.stage = 0
@@ -31,7 +34,10 @@ class Playing(Display):
         self.Text_list.append(Text((690, 414), 20, '', C.BLACK))
         self.Text_list.append(Text((690, 532), 20, '', C.BLACK))
         self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
-
+        
+        
+        self.Timer = Text((240, 120), 20, '', C.BLACK)
+        
         self.choice_card_idx = None
 
     def computer_add_remove(self, idx, item):
@@ -43,6 +49,8 @@ class Playing(Display):
             self.num_of_players += 1
 
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
+        self.Timer.change_text(str(self.time//60))
+        self.Timer.draw(self.screen)
         for idx, item in enumerate(self.Player_list):
             if self.is_computer_activated[idx]:
                 item.INACTIVE_COLOR = C.GRAY
@@ -80,13 +88,14 @@ class Playing(Display):
                         new_color = None
                     print("Player {} played {}".format(player, card))
                     self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
-                    
+                    self.time = 1800
                 self.choice_card_idx = None
         
         else:
             print("Player {} picked up".format(player))
             self.game.play(player=player_id, card=None)
             pg.time.wait(200)
+            self.time = 1800
 
     def game_handler(self, running):
         if Playing.game == None:
@@ -101,11 +110,6 @@ class Playing(Display):
                     self.screen.blit(myCard.img, (self.x, self.y))
                 self.x += 50
             '''
-            myCard.draw(self.screen, self.x, self.y)
-            self.x += 50
-            if self.x >= 500:
-                self.x = 0
-                self.y += 100
         self.top.draw(self.screen, 150, 100)
         self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
         self.backCard.draw(self.screen, 100, 100)
@@ -124,11 +128,13 @@ class Playing(Display):
                             new_color = None
                         print("Computer {} played {}".format(player, card))
                         self.game.play(player=player_id, card=i, new_color=new_color)
+                        self.time = 1800
                         pg.time.wait(500)
                         break
             else:
                 print("Computer {} picked up".format(player))
                 self.game.play(player=player_id, card=None)
+                self.time = 1800
                 pg.time.wait(500)
 
     def single_mode(self, running):
@@ -143,8 +149,26 @@ class Playing(Display):
         else:
             self.start_button.draw(self.screen)
 
+        if self.is_game_start:
+            for item in self.Card_list:
+                item.draw(self.screen, self.x, self.y)
+                self.x += 50
+                if self.x >= 500:
+                    self.x = 0
+                    self.y += 100
+    
         self.update_screen(pg.mouse.get_pos())
-        
+
+        if self.is_game_start:
+            self.x = 0
+            self.y = 300
+            for item in self.Card_list:
+                item.draw(self.screen, self.x, self.y)
+                self.x += 50
+                if self.x >= 500:
+                    self.x = 0
+                    self.y += 100
+
         if self.is_game_start:
             x_ = 640
             y_ = 40
@@ -182,8 +206,41 @@ class Playing(Display):
                 running[0] = False
                 return
             elif event.type == pg.KEYUP:
-                if event.key == pg.K_ESCAPE:
-                    self.mode[C.NEXT_SCREEN] = C.STOP
+                for idx, item in enumerate(Data.data.KEY_Settings):
+                    if event.key == item:
+                        if idx == 0: # up
+                            if self.key_loate-10 >= 0:
+                                self.Card_list[self.key_locate].on_key = False
+                                self.key_locate -= 10
+                                self.Card_list[self.key_locate].on_key = True
+                        elif idx == 1: # left
+                            if self.key_locate%10 != 0:
+                                self.Card_list[self.key_locate].on_key = False
+                                self.key_locate -= 1
+                                self.Card_list[self.key_locate].on_key = True
+                        elif idx == 2: # down
+                            if self.key_locate+10<=len(self.Card_list)-1:
+                                self.Card_list[self.key_locate].on_key = False
+                                self.key_locate += 10
+                                self.Card_list[self.key_locate].on_key = True
+                        elif idx == 3: # right
+                            if (self.key_locate != len(self.Card_list)-1) and ((self.key_locate+1)%10 != 0):
+                                self.Card_list[self.key_locate].on_key = False
+                                self.key_locate += 1
+                                self.Card_list[self.key_locate].on_key = True
+                        elif idx == 4: # return
+                            pass
+                        elif idx == 5: # escape
+                            self.mode[C.NEXT_SCREEN] = C.STOP
+                        elif idx == 6:
+                            pass
+                        elif idx == 7:
+                            pass
+                        elif idx == 8:
+                            pass
+                        elif idx == 9:
+                            pass
+
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if self.tmp_event.type == pg.QUIT:
                     running[0] = False
@@ -203,12 +260,28 @@ class Playing(Display):
                         item.click((idx, item))
                 if self.start_button.above and not self.is_game_start:
                     self.start_button.click()
+        if self.is_game_start:
+            self.x = 0
+            self.y = 300
+            for item in self.Card_list:
+                item.draw(self.screen, self.x, self.y)
+                self.x += 50
+                if self.x >= 500:
+                    self.x = 0
+                    self.y += 100
+        pg.display.update()
 
     def story_mode(self, stage, running):
         pass
 
     def main_loop(self, running):
-        # # game inst
+        # game inst
+        pg.time.Clock().tick(60)
+        if self.is_game_start:
+            if self.time <= 0:
+                self.time = 1800
+            else:
+                self.time -= 1
         if Playing.game_mode == 0:
             self.single_mode(running)
         elif Playing.game_mode == 1:

@@ -19,9 +19,12 @@ class CardButton:
         else:
             self.above = False
 
-    def draw(self, screen, x, y):
+    def draw(self, screen, x, y): # 왼쪽 위 모서리 좌표
         self.rect = pg.Rect(x, y, 45, 90)
         screen.blit(self.img, (x,y))
+        if self.above or self.on_key:
+            print(x, y)
+            pg.draw.rect(screen, (191,255,0), [x, y, 45, 90], 3)
 
     def click(self, params = None):
         print(self.card_name)

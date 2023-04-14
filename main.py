@@ -13,7 +13,6 @@ def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
     Data.load_settings()
-    pg.time.Clock().tick(60)
     Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story()]
     running = [True]
     while running[0]:
