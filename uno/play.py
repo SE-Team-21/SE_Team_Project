@@ -67,17 +67,18 @@ class Playing(Display):
 
     def click_uno(self, who):
         print("click uno button, player ", who)
-        valid = 0
+        valid = -1
         game = Playing.game
         for player in game.players:
-            if (len(player.hand) == 1):
-                valid += 1
+            if (len(player.hand) == 1): # 1장인 사람이 여려명이면
+                valid = player.player_id
+                break
                 
-        if valid:
-            if self.game.current_player.player_id != who: # who가 아닌 사람이 uno일 때 who가 누른 경우
-                self.game._pick_up(self.game.current_player, 1)
+        if valid != -1:
+            if valid != who: # who가 아닌 사람이 uno일 때 who가 누른 경우
+                self.game._pick_up(valid, 1)
             else: # 내꺼 내가누름
-                self.game.current_player.uno_state = True
+                self.game.players[valid].uno_state = True
         else: 
             pass
 
@@ -179,14 +180,13 @@ class Playing(Display):
         player_id = player.player_id
         if player_id == 0: # 나
             self.player_action(running)
+            # here
         else: # ai
             if player.can_play(self.game.current_card):
-                # 30 - random 
-                if 1800 - self.time < 60*random.uniform(1, 2):
+                # 30 - random
+                if 1800 - self.time < 60*random.uniform(2, 4):
                     pass
                 else:
-                    if len(player.hand) == 1:
-                        self.click_uno(player_id)
                     for i, card in enumerate(player.hand):
                         if self.game.current_card.playable(card):
                             if len(player.hand) > 1 or (len(player.hand) == 1 and player.uno_state):
@@ -198,6 +198,9 @@ class Playing(Display):
                                 self.game.play(player=player_id, card=i, new_color=new_color)
                                 self.time = 1800
                                 break
+                    if 1800 -self.time < 60*random.uniform(0.8, 1):
+                        if len(player.hand) == 1:
+                            self.click_uno(player_id)
             else:
                 print("Computer {} picked up".format(player))
                 self.game.play(player=player_id, card=None)

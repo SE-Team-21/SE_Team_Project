@@ -15,8 +15,7 @@ class Background_Music:
     def play(self):
         #pg.mixer.music.load(self.music)
         #pg.mixer.music.play(-1)
-        self.volume(Data.data.Music_Volume)
-        self.channel.set_volume(self._volume)
+        self.channel.set_volume(Data.data.Music_Volume)
         self.channel.play(self.music)
 
     def volume(self, v):
@@ -40,8 +39,7 @@ class Effect_Music:
     def play(self):
         #effect = pg.mixer.Sound(self.effect_music)
         #effect.play(1)
-        self.volume(Data.data.Effect_Volume)
-        self.channel.set_volume(self._volume)
+        self.channel.set_volume(Data.data.Effect_Volume)
         self.channel.play(self.effect_music)
 
     def volume(self,v):
@@ -56,6 +54,9 @@ class Effect_Music:
         effect.stop()
 
 Data.load_settings()
+
+
+
 bg_music = Background_Music(0)
 ef_music = Effect_Music(4)
 
