@@ -52,7 +52,7 @@ class Story(Display):
         if Playing.game == None:
                 Playing.game = UnoGame(5) # game inst
         else:
-            Playing.reset()
+            pass
         '''if idx==0:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
         if idx==1:
