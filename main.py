@@ -8,11 +8,15 @@ from uno.mode import Mode
 from uno.play import Playing
 import uno.Constants as C
 from uno.KeySettings import Data
+import importlib.util
 
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
     Data.load_settings()
+    spec = importlib.util.spec_from_file_location("Music", "uno/Music.py")
+    my_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(my_module)
     Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story()]
     running = [True]
     while running[0]:
