@@ -95,6 +95,7 @@ class Playing(Display):
 
     def update_screen(self, mouse_pos): # 현재 화면 업데이트
         self.Timer.change_text(str(self.time//60))
+        self.Timer.change_size(Display.display_idx)
         self.Timer.draw(self.screen)
         for idx, item in enumerate(self.Player_list):
             if self.is_computer_activated[idx]:
@@ -105,12 +106,14 @@ class Playing(Display):
                 item.INACTIVE_COLOR = C.WHITE
                 item.locate = False
                 item.change_text('empty')
+            item.change_size(Display.display_idx)
             item.update(mouse_pos)
             item.draw(self.screen)
-            item.change_size(Display.display_idx)
         for item in self.Card_list:
             item.update(mouse_pos)
+        self.start_button.change_size(Display.display_idx)
         self.start_button.update(mouse_pos)
+        self.Uno_Button.change_size(Display.display_idx)
         self.Uno_Button.update(mouse_pos)
         
     def next_screen(self):
@@ -367,6 +370,8 @@ class Playing(Display):
                 if self.x >= 500:
                     self.x = 0
                     self.y += 100
+        if Display.colorblind_idx != -1:
+            self.color()
         pg.display.update()
 
     def story_mode(self, stage, running):
