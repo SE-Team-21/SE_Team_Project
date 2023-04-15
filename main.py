@@ -7,8 +7,6 @@ from uno.story import Story
 from uno.mode import Mode
 from uno.play import Playing
 import uno.Constants as C
-from uno.KeySettings import Data
-import importlib.util
 
 def uno_mainloop():
     pg.init()

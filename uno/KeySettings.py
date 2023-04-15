@@ -52,7 +52,6 @@ class Data:
     def default():
         Data.data.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4]
         Data.data.Resolution = 0
-        Data.data.Story = 0
         Data.data.Color = -1
         Data.data.Master_Volume = 0.5
         Data.data.Music_Volume = 0.5
