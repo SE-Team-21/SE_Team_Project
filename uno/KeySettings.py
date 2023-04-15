@@ -8,9 +8,10 @@ class Data:
         self.Resolution = 0
         self.Story = 0
         self.Color = -1
-        self.Master_Volume = 0.5
-        self.Music_Volume = 0.5
-        self.Effect_Volume = 0.5
+        self.load_settings()
+        #self.Master_Volume = 0.5
+        #self.Music_Volume = 0.5
+        #self.Effect_Volume = 0.5
 
     @staticmethod
     def save():

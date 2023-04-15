@@ -153,7 +153,7 @@ class Playing(Display):
         else:
             print("Player {} picked up".format(player))
             self.game.play(player=player_id, card=None)
-            pg.time.wait(200)
+            pg.time.wait(2000)
             self.time = 1800
 
 
@@ -182,7 +182,7 @@ class Playing(Display):
         else: # ai
             if player.can_play(self.game.current_card):
                 # 30 - random 
-                if 1800 - self.time < 60*random.uniform(0.1, 0.2):
+                if 1800 - self.time < 60*random.uniform(1, 2):
                     pass
                 else:
                     if len(player.hand) == 1:
