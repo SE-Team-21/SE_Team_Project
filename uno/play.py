@@ -23,16 +23,16 @@ class Playing(Display):
         self.is_game_start = False
         self.is_computer_activated = [False, False, False, False, False]
         self.Player_list = []
-        self.Player_list.append(Button((710, 60), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((710, 178), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((710, 296), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((710, 414), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
-        self.Player_list.append(Button((710, 532), (160, 100), 'empty', lambda x, y: self.computer_add_remove(x, y)))
-        self.Text_list.append(Text((690, 60), 20, '', C.BLACK))
-        self.Text_list.append(Text((690, 178), 20, '', C.BLACK))
-        self.Text_list.append(Text((690, 296), 20, '', C.BLACK))
-        self.Text_list.append(Text((690, 414), 20, '', C.BLACK))
-        self.Text_list.append(Text((690, 532), 20, '', C.BLACK))
+        self.Player_list.append(Button((710, 160), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 250), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 340), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 430), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Player_list.append(Button((710, 520), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))
+        self.Text_list.append(Text((690, 160), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 250), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 340), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 430), 20, '', C.BLACK))
+        self.Text_list.append(Text((690, 520), 20, '', C.BLACK))
         self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
         self.Color_list = []
         self.Color_list.append(Button((380, 120), (40, 40), 'RED', lambda x: self.choice_color(x)))
@@ -49,7 +49,7 @@ class Playing(Display):
         self.is_color_choice = False
         self.Timer = Text((240, 120), 20, '', C.BLACK)
         self.choice_card_idx = None
-        self.name_input_box = Button((80, 270), (100, 40), 'You', )
+        self.name_input_box = Button((710, 70), (160, 80), 'You', )
         self.name_infor = Text((140, 256), 20, 'Only Alphabet up to 7 char and Enter', C.BLACK)
         self.my_name = 'You'
         self.input_active = False
@@ -249,7 +249,7 @@ class Playing(Display):
                     self.x = 0
                     self.y += 100
             x_ = 640
-            y_ = 40
+            y_ = 140
             index = 0
 
             for idx in range(5):
@@ -258,7 +258,7 @@ class Playing(Display):
                     self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
                     self.Text_list[idx].draw(self.screen)
                     index += 1
-                y_ += 118
+                y_ += 90
 
             if self.game.current_card.color == 'red': # 현재 색깔 표시
                 pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
