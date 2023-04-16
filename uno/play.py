@@ -76,9 +76,45 @@ class Playing(Display):
     '''
     def draw_arrow(self):
         if self.game._player_cycle._reverse: # 화살표 위로
-            self.screen.blit(self.up_arrow, (560, 0))
+            self.screen.blit(self.up_arrow, (550, 80))
         else: # 화살표 아래로
-            self.screen.blit(self.down_arrow, (560, 0))
+            self.screen.blit(self.down_arrow, (550, 0))
+        id = self.game.current_player.player_id
+        if id == 0:
+            self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 50))
+        else:
+            idx = 0
+            for i in self.is_computer_activated:
+                if i:
+                    id -= 1
+                    idx += 1
+                else:
+                    idx += 1
+                if id == 0:
+                    break
+            if idx == 1:
+                self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 140))
+            elif idx == 2:
+                self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 230))
+            elif idx == 3:
+                self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 320))
+            elif idx == 4:
+                self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 410))
+            elif idx == 5:
+                self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 500))
+
+        if id == 0:
+            pass
+        elif id == 1:
+            pass
+        elif id == 2:
+            pass
+        elif id == 3:
+            pass
+        elif id == 4:
+            pass
+        elif id == 5:
+            pass
 
     def temp(self):
         self.screen.fill((255, 255, 255))
@@ -105,75 +141,96 @@ class Playing(Display):
                 index += 1
             y_ += 90
         self.Uno_Button.draw(self.screen)
+        self.top.draw(self.screen, 150, 100)
+        self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
+        self.backCard.draw(self.screen, 100, 100)
+        if self.game.current_card.color == 'red': # 현재 색깔 표시
+                pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
+        elif self.game.current_card.color == 'green':
+            pg.draw.rect(self.screen, C.GREEN, (100, 50, 50, 50))
+        elif self.game.current_card.color == 'yellow':
+            pg.draw.rect(self.screen, C.YELLOW, (100, 50, 50, 50))
+        elif self.game.current_card.color == 'blue':
+            pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
+        elif self.game.current_card.color == 'black':
+            if self.game.current_card.temp_color == 'red':
+                pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
+            elif self.game.current_card.temp_color == 'green':
+                pg.draw.rect(self.screen, C.GREEN, (100, 50, 50, 50))
+            elif self.game.current_card.temp_color == 'yellow':
+                pg.draw.rect(self.screen, C.YELLOW, (100, 50, 50, 50))
+            elif self.game.current_card.temp_color == 'blue':
+                pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
 
     def card_motion(self, idx):
+        fps = 120
         target_x = 100
         target_y = 100
         if idx == 0:
             start_x = 640
             start_y = 50
             current_x = 640
-            current_y = 140
-            for i in range(480):
+            current_y = 50
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
         elif idx == 1:
             start_x = 640
             start_y = 140
             current_x = 640
-            current_y = 230
-            for i in range(480):
+            current_y = 140
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
         elif idx == 2:
             start_x = 640
             start_y = 230
             current_x = 640
-            current_y = 320
-            for i in range(480):
+            current_y = 230
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
         elif idx == 3:
             start_x = 640
             start_y = 340
             current_x = 640
-            current_y = 410
-            for i in range(480):
+            current_y = 340
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
         elif idx == 4:
             start_x = 640
-            stary_y = 410
+            start_y = 410
             current_x = 640
-            current_y = 500
-            for i in range(480):
+            current_y = 410
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
         elif idx == 5:
             start_x = 640
             start_y = 500
             current_x = 640
-            current_y = 590
-            for i in range(480):
+            current_y = 500
+            for i in range(fps):
                 self.temp()
                 self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-                current_x -= (start_x - target_x)/480
-                current_y -= (start_y - target_y)/480
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
                 pg.display.update()
 
     def click_uno(self, who):
