@@ -26,11 +26,13 @@ class Story(Display):
         self.area1_d = pg.transform.scale(pg.image.load("./assets/images/area1.png"), (int(180*C.WEIGHT[Display.display_idx]), int(341*C.WEIGHT[Display.display_idx])))
         self.area2_d = pg.transform.scale(pg.image.load("./assets/images/area2.png"), (int(180*C.WEIGHT[Display.display_idx]), int(351*C.WEIGHT[Display.display_idx])))
         self.area3_d = pg.transform.scale(pg.image.load("./assets/images/area3.png"), (int(180*C.WEIGHT[Display.display_idx]), int(330*C.WEIGHT[Display.display_idx])))
+        self.area4_d = pg.transform.scale(pg.image.load("./assets/images/area4.png"), (int(360*C.WEIGHT[Display.display_idx]), int(250*C.WEIGHT[Display.display_idx])))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/story_map.png"), C.DISPLAY_SIZE[Display.display_idx])
         self.cloudimg = pg.transform.scale(pg.image.load("./assets/images/cloud.png"), (int(444*C.WEIGHT[Display.display_idx]), int(300*C.WEIGHT[Display.display_idx])))
         self.area1 = pg.transform.scale(pg.image.load("./assets/images/area1.png"), (int(180*C.WEIGHT[Display.display_idx]), int(341*C.WEIGHT[Display.display_idx])))
         self.area2 = pg.transform.scale(pg.image.load("./assets/images/area2.png"), (int(180*C.WEIGHT[Display.display_idx]), int(351*C.WEIGHT[Display.display_idx])))
         self.area3 = pg.transform.scale(pg.image.load("./assets/images/area3.png"), (int(180*C.WEIGHT[Display.display_idx]), int(330*C.WEIGHT[Display.display_idx])))
+        self.area4 = pg.transform.scale(pg.image.load("./assets/images/area4.png"), (int(360*C.WEIGHT[Display.display_idx]), int(250*C.WEIGHT[Display.display_idx])))
         self.yes_button = Button((340, 300), (100, 50), 'Game Start')
         self.no_button = Button((460, 300), (100, 50), 'Cancel')
         self.active = [True, False, False, False]
@@ -77,6 +79,7 @@ class Story(Display):
             self.area1 = pg.transform.scale(self.area1_d, (int(180*C.WEIGHT[Display.display_idx]), int(341*C.WEIGHT[Display.display_idx])))
             self.area2 = pg.transform.scale(self.area2_d, (int(180*C.WEIGHT[Display.display_idx]), int(351*C.WEIGHT[Display.display_idx])))
             self.area3 = pg.transform.scale(self.area3_d, (int(180*C.WEIGHT[Display.display_idx]), int(330*C.WEIGHT[Display.display_idx])))
+            self.area4 = pg.transform.scale(self.area4_d, (int(360*C.WEIGHT[Display.display_idx]), int(250*C.WEIGHT[Display.display_idx])))
             self.screen.blit(self.backgroundimg, (0, 0))
             if Data.data.Story == 0:
                 self.screen.blit(self.cloudimg, (int(50*C.WEIGHT[Display.display_idx]), int(160*C.WEIGHT[Display.display_idx])))
@@ -96,7 +99,7 @@ class Story(Display):
                     elif idx == 2:
                         self.screen.blit(self.area3, (int(478*C.WEIGHT[Display.display_idx]), int(56*C.WEIGHT[Display.display_idx])))
                     elif idx == 3:
-                        pass
+                        self.screen.blit(self.area4, (int(365*C.WEIGHT[Display.display_idx]), int(235*C.WEIGHT[Display.display_idx])))
             for idx, item in enumerate(self.Checked_list):
                 if self.clear[idx]:
                     item.change_size(Display.display_idx)
@@ -134,12 +137,12 @@ class Story(Display):
                         if Data.data.Story<=2 and (self.index == Data.data.Story):
                             self.clear[Data.data.Story] = True
                             Data.save_story(Data.data.Story+1)
+                        elif self.index == 3:
+                            self.clear[Data.data.Story] = True
                         for i in range(Data.data.Story+1):
                             self.active[i]=True
-                        pass
                     elif self.no_button.above:
                         self.phase = 1
                         self.index = None
-                        pass
                     for item in self.Area_list:
                         item.on_key = False
