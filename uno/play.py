@@ -50,7 +50,7 @@ class Playing(Display):
         self.Timer = Text((240, 120), 20, '', C.BLACK)
         self.choice_card_idx = None
         self.name_input_box = Button((80, 270), (100, 40), 'You', )
-        self.name_infor = Text((60, ), 20, 'Alphabet only up to 7 char and Enter', C.BLACK)
+        self.name_infor = Text((140, 256), 20, 'Only Alphabet up to 7 char and Enter', C.BLACK)
         self.my_name = 'You'
         self.input_active = False
 
@@ -110,7 +110,8 @@ class Playing(Display):
         self.name_input_box.update(mouse_pos)
         self.name_input_box.draw(self.screen)
         if self.input_active:
-            pass
+            self.name_infor.change_size(Display.display_idx)
+            self.name_infor.draw(self.screen)
         for idx, item in enumerate(self.Player_list):
             if self.is_computer_activated[idx]:
                 item.INACTIVE_COLOR = C.GRAY
