@@ -40,7 +40,7 @@ class Story(Display):
         self.phase = 1
 
         #Load Setting
-        for i in range(Data.data.Story):
+        for i in range(Data.data.Story): # 클리어 상태도 저장해야됨
             self.active[i]=True
             self.clear[i]=True
         self.active[Data.data.Story] = True
