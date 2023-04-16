@@ -53,7 +53,7 @@ class Data:
     def save_name(name):
         Data.data.name = name
         Data.save()
-        
+
     @staticmethod
     def default():
         Data.data.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4]

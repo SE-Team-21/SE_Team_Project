@@ -53,6 +53,9 @@ class Playing(Display):
         self.name_infor = Text((140, 256), 20, 'Only Alphabet up to 7 char and Enter', C.BLACK)
         self.my_name = 'You'
         self.input_active = False
+        self.up_arrow = pg.image.load("./assets/images/up_arrow.png")
+        self.down_arrow = pg.image.load("./assets/images/down_arrow.png")
+        self.right_arrow = pg.image.load("./assets/images/right_arrow.png")
 
         # Load Setting
         self.name_input_box.change_text(Data.data.name)
@@ -71,7 +74,107 @@ class Playing(Display):
 
 
     '''
+    def draw_arrow(self):
+        if self.game._player_cycle._reverse: # 화살표 위로
+            self.screen.blit(self.up_arrow, (560, 0))
+        else: # 화살표 아래로
+            self.screen.blit(self.down_arrow, (560, 0))
 
+    def temp(self):
+        self.screen.fill((255, 255, 255))
+        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
+                                            int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
+        self.x = 0
+        self.y = 300
+        for item in self.Card_list:
+            item.draw(self.screen, self.x, self.y)
+            self.x += 50
+            if self.x >= 500:
+                self.x = 0
+                self.y += 100
+        self.update_screen(pg.mouse.get_pos())
+        x_ = 640
+        y_ = 140
+        index = 0
+
+        for idx in range(5):
+            if self.is_computer_activated[idx]:
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (x_, y_))
+                self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
+                self.Text_list[idx].draw(self.screen)
+                index += 1
+            y_ += 90
+        self.Uno_Button.draw(self.screen)
+
+    def card_motion(self, idx):
+        target_x = 100
+        target_y = 100
+        if idx == 0:
+            start_x = 640
+            start_y = 50
+            current_x = 640
+            current_y = 140
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
+        elif idx == 1:
+            start_x = 640
+            start_y = 140
+            current_x = 640
+            current_y = 230
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
+        elif idx == 2:
+            start_x = 640
+            start_y = 230
+            current_x = 640
+            current_y = 320
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
+        elif idx == 3:
+            start_x = 640
+            start_y = 340
+            current_x = 640
+            current_y = 410
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
+        elif idx == 4:
+            start_x = 640
+            stary_y = 410
+            current_x = 640
+            current_y = 500
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
+        elif idx == 5:
+            start_x = 640
+            start_y = 500
+            current_x = 640
+            current_y = 590
+            for i in range(480):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/480
+                current_y -= (start_y - target_y)/480
+                pg.display.update()
 
     def click_uno(self, who):
         print("click uno button, player ", who)
@@ -168,6 +271,7 @@ class Playing(Display):
                             self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
                             self.choice_card_idx = None
                             self.time = 1800
+                            self.card_motion(0)
         
         else:
             print("Player {} picked up".format(player))
@@ -215,6 +319,7 @@ class Playing(Display):
                                 print("Computer {} played {}".format(player, card))
                                 self.game.play(player=player_id, card=i, new_color=new_color)
                                 self.time = 1800
+                                self.card_motion(player_id)
                                 break
                     if 1800 -self.time < 60*random.uniform(0.8, 1):
                         if len(player.hand) == 1:
@@ -259,7 +364,7 @@ class Playing(Display):
                     self.Text_list[idx].draw(self.screen)
                     index += 1
                 y_ += 90
-
+            self.draw_arrow()
             if self.game.current_card.color == 'red': # 현재 색깔 표시
                 pg.draw.rect(self.screen, C.RED, (100, 50, 50, 50))
             elif self.game.current_card.color == 'green':
