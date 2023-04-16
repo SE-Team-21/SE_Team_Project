@@ -39,31 +39,61 @@ class Start(Display):
                         item.click((idx, running))
             elif event.type == pg.KEYUP:
                 for idx, item in enumerate(Data.data.KEY_Settings):
-                    if event.key == item:
-                        if idx == 0 or idx == 1: # Up and Left Key
-                            if Display.key_idx == 0:
-                                self.Button_list[Display.key_idx].on_key = False
-                                Display.key_idx = len(self.Button_list)-1
-                            elif Display.key_idx == -1:
-                                Display.key_idx = 0
-                            else:
-                                self.Button_list[Display.key_idx].on_key = False
-                                Display.key_idx -= 1
-                            self.Button_list[Display.key_idx].on_key = True
-                        elif idx == 2 or idx == 3: # Right and Down Key
-                            if Display.key_idx == len(self.Button_list)-1:
-                                self.Button_list[Display.key_idx].on_key = False
-                                Display.key_idx = 0
-                            elif Display.key_idx == -1:
-                                Display.key_idx = 0
-                            else:
-                                self.Button_list[Display.key_idx].on_key = False
-                                Display.key_idx += 1
-                            self.Button_list[Display.key_idx].on_key = True
-                        elif idx == 4: # Return Key
-                            if Display.key_idx != -1:
-                                self.Button_list[Display.key_idx].on_key = False
-                                self.next_screen(Display.key_idx, running)
-                                Display.key_idx = -1
-                if event.key not in Data.data.KEY_Settings:
-                    print("error")
+                    try:
+                        if event.key == item:
+                            if idx == 0 or idx == 1: # Up and Left Key
+                                if Display.key_idx == 0:
+                                    self.Button_list[Display.key_idx].on_key = False
+                                    Display.key_idx = len(self.Button_list)-1
+                                elif Display.key_idx == -1:
+                                    Display.key_idx = 0
+                                else:
+                                    self.Button_list[Display.key_idx].on_key = False
+                                    Display.key_idx -= 1
+                                self.Button_list[Display.key_idx].on_key = True
+                            elif idx == 2 or idx == 3: # Right and Down Key
+                                if Display.key_idx == len(self.Button_list)-1:
+                                    self.Button_list[Display.key_idx].on_key = False
+                                    Display.key_idx = 0
+                                elif Display.key_idx == -1:
+                                    Display.key_idx = 0
+                                else:
+                                    self.Button_list[Display.key_idx].on_key = False
+                                    Display.key_idx += 1
+                                self.Button_list[Display.key_idx].on_key = True
+                            elif idx == 4: # Return Key
+                                if Display.key_idx != -1:
+                                    self.Button_list[Display.key_idx].on_key = False
+                                    self.next_screen(Display.key_idx, running)
+                                    Display.key_idx = -1
+                    except Exception:
+                        pass
+
+                    try: # KEY_Settings에 없는 키를 눌렀을 때 누를 수 있는 키 출력
+                        if event.key not in Data.data.KEY_Settings:
+                            self.font_size = 25
+                            self.font = pg.font.Font(None, self.font_size)
+                            self.text = "Only use : "
+                            
+                            for text_value in Data.data.KEY_Settings:
+                                self.text = self.text + pg.key.name(text_value) + ' '
+            
+                            self.text_color = (0,0,0)
+                            self.text_surface = self.font.render(self.text, True, self.text_color)
+                            self.text_rect = self.text_surface.get_rect(center=(250, 100))
+                            self.screen.blit(self.text_surface, self.text_rect)
+                            self.start_ticks = pg.time.get_ticks()
+                            self.running = True
+                            while self.running:
+                                for event in pg.event.get():
+                                    if event.type == pg.QUIT:
+                                        pg.quit()
+                                        quit()
+                                self.elapsed_ticks = pg.time.get_ticks() - self.start_ticks
+                                if self.elapsed_ticks > 100:
+                                    pg.display.update()
+                                    break
+                                pg.display.update()
+                                
+                    except Exception:
+                        pass
