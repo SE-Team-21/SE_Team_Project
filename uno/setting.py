@@ -24,6 +24,7 @@ class Setting(Display):
         self.Button_list.append(Button((680, 250), (120, 30), '2', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((680, 290), (120, 30), '3', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((680, 330), (120, 30), '4', lambda idx, running: self.button_setting(idx, running)))
+        self.Button_list.append(Button((680, 370), (120, 30), '5', lambda idx, running: self.button_setting(idx, running)))
         self.Button_list.append(Button((700, 510), (140, 40), 'Default Options', lambda idx, running: self.default_setting(idx, running)))
         self.Button_list.append(Button((700, 570), (140, 40), 'Back', lambda idx, running: self.next_screen(idx, running)))
         self.Text_list.append(Text((20, 20), 30, 'DISPLAY', C.WHITE))
@@ -42,6 +43,7 @@ class Setting(Display):
         self.Text_list.append(Text((440, 240), 20, 'Green', C.WHITE))
         self.Text_list.append(Text((440, 280), 20, 'Blue', C.WHITE))
         self.Text_list.append(Text((440, 320), 20, 'Yellow', C.WHITE))
+        self.Text_list.append(Text((440, 360), 20, 'Draw', C.WHITE))
         self.Text_list.append(Text((20, 440), 30, 'SOUND', C.WHITE))
         self.Text_list.append(Text((40, 490), 20, 'Master Volume', C.WHITE))
         self.Text_list.append(Text((40, 530), 20, 'Music Volume', C.WHITE))
@@ -54,10 +56,10 @@ class Setting(Display):
         self.dragging = False
         self.slider_idx = 0
         self.index = 0
-        self.active = [False, True, False, True, True, True, True, True, True, True, True, True, True, True, True, True]
+        self.active = [False, True, False, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
 
         # Load Setting
-        for i in range(10):
+        for i in range(11):
             self.Button_list[i+4].change_text(pg.key.name(Data.data.KEY_Settings[i]))
         Display.display_idx = Data.data.Resolution
         self.Text_list[2].change_text(C.DISPLAY_SIZE_STR[Display.display_idx])

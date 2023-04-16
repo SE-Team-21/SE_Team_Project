@@ -4,7 +4,7 @@ import dill
 class Data:
     data = None
     def __init__(self):
-        self.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4]
+        self.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]
         self.Resolution = 0
         self.Story = 0
         self.Color = -1
@@ -56,7 +56,7 @@ class Data:
 
     @staticmethod
     def default():
-        Data.data.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4]
+        Data.data.KEY_Settings = [pg.K_UP, pg.K_LEFT, pg.K_DOWN, pg.K_RIGHT, pg.K_RETURN, pg.K_ESCAPE, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]
         Data.data.Resolution = 0
         Data.data.Color = -1
         Data.data.Master_Volume = 0.5
