@@ -40,9 +40,11 @@ class Story(Display):
         self.phase = 1
 
         #Load Setting
-        for i in range(Data.data.Story): # 클리어 상태도 저장해야됨
+        for i in range(Data.data.Story):
             self.active[i]=True
             self.clear[i]=True
+        if Data.data.Clear:
+            self.clear[3]=True
         self.active[Data.data.Story] = True
 
 
@@ -139,6 +141,7 @@ class Story(Display):
                             Data.save_story(Data.data.Story+1)
                         elif self.index == 3:
                             self.clear[Data.data.Story] = True
+                            Data.save_clear()
                         for i in range(Data.data.Story+1):
                             self.active[i]=True
                     elif self.no_button.above:

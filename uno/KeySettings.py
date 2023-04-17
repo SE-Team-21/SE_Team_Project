@@ -8,6 +8,7 @@ class Data:
         self.Resolution = 0
         self.Story = 0
         self.Color = -1
+        self.Clear = False
         self.name = 'You'
         self.load_settings()
         #self.Master_Volume = 0.5
@@ -47,6 +48,11 @@ class Data:
     @staticmethod
     def save_story(idx):
         Data.data.Story = idx
+        Data.save()
+
+    @staticmethod
+    def save_clear():
+        Data.data.Clear = True
         Data.save()
 
     @staticmethod
