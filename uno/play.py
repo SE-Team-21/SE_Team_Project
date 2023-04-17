@@ -13,6 +13,7 @@ class Playing(Display):
     game_mode = 0
     def __init__(self):
         super().__init__()
+        self.win = False
         self.Card_list = []
         self.time = 1800
         self.key_locate = 0
@@ -330,7 +331,7 @@ class Playing(Display):
             self.player_action(running)
             # here
         else: # ai
-            if player.can_play(self.game.current_card):
+            if player.can_play(self.game.current_card) and Playing.game.is_active:
                 # 30 - random
                 if 1800 - self.time < 60*random.uniform(2, 4):
                     pass
@@ -346,11 +347,15 @@ class Playing(Display):
                                 self.game.play(player=player_id, card=i, new_color=new_color)
                                 self.time = 1800
                                 self.card_motion(player_id)
+                                if Playing.game.is_active == False:
+                                    self.is_game_start = False
+                                    self.win = True
+                                    break
                                 break
                     if 1800 -self.time < 60*random.uniform(0.8, 1):
                         if len(player.hand) == 1:
                             self.click_uno(player_id)
-            else:
+            elif Playing.game.is_active:
                 print("Computer {} picked up".format(player))
                 self.game.play(player=player_id, card=None)
                 self.time = 1800
@@ -358,6 +363,7 @@ class Playing(Display):
 
     def single_mode(self, running):
         if self.is_game_start: # 인게임화면
+            self.win = False
             self.screen.fill((255, 255, 255))
             pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                 int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
@@ -471,6 +477,9 @@ class Playing(Display):
                                                 int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
             self.start_button.draw(self.screen)
             self.update_screen(pg.mouse.get_pos())
+            if self.win:
+                pass
+                #Playing.game._winner
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running[0] = False

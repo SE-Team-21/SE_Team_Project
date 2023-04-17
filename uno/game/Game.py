@@ -117,7 +117,8 @@ class UnoGame:
                     'Invalid new_color: must be red, yellow, green or blue'
                 )
         if not self.is_active:
-            raise ValueError('Game is over')
+            pass
+            #raise ValueError('Game is over')
 
         played_card = _player.hand.pop(card)
         self.deck.append(played_card)
