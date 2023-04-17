@@ -82,7 +82,9 @@ class Playing(Display):
             self.screen.blit(pg.transform.scale(self.circle, (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx]))), (int(300*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
         else:
             self.screen.blit(pg.transform.scale(self.uncircle, (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx]))), (int(300*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
-        pg.time.wait(1000)
+        pg.display.update()
+        pg.time.wait(3000)
+
     def draw_arrow(self):
         if self.game._player_cycle._reverse: # 화살표 위로
             self.screen.blit(pg.transform.scale(self.up_arrow, (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx]))), (int(550*C.WEIGHT[Display.display_idx]), int(40*C.WEIGHT[Display.display_idx])))
