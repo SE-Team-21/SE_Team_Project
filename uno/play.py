@@ -148,7 +148,7 @@ class Playing(Display):
 
     def card_motion(self, idx):
         fps = 120
-        target_x = 100
+        target_x = 150
         target_y = 100
         if idx == 0:
             locate = self.choice_card_idx
@@ -158,7 +158,7 @@ class Playing(Display):
             current_y = start_y
             for i in range(fps):
                 self.temp()
-                self.screen.blit(pg.transform.scale(C.ALL_CARDS[str(Playing.game.players[0].hand[self.choice_card_idx].color) + str(Playing.game.players[0].hand[self.choice_card_idx].card_type)], (30,60)), (current_x, current_y))
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS[str(Playing.game.players[0].hand[self.choice_card_idx].color) + str(Playing.game.players[0].hand[self.choice_card_idx].card_type)], (45,90)), (current_x, current_y))
                 current_x -= (start_x - target_x)/fps
                 current_y -= (start_y - target_y)/fps
                 pg.display.update()
@@ -169,14 +169,14 @@ class Playing(Display):
             current_y = start_y
             for i in range(fps):
                 self.temp()
-                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (45,90)), (current_x, current_y))
                 current_x -= (start_x - target_x)/fps
                 current_y -= (start_y - target_y)/fps
                 pg.display.update()
 
     def pick_up_motion(self, idx):
         fps = 120
-        start_x = 100
+        start_x = 150
         start_y = 100
         current_x = start_x
         current_y = start_y
