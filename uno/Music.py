@@ -17,7 +17,7 @@ class Background_Music:
 
     def volume(self, mst, back):
         self.channel.set_volume(mst * back)
-        print("bg : ", self.channel.get_volume())
+        #print("bg : ", self.channel.get_volume())
     
     def stop(self):
         pg.mixer.music.stop()
@@ -30,12 +30,12 @@ class Effect_Music:
         self.channel = pg.mixer.Channel(1)        
         
     def play(self):
-        self.channel.set_volume(Data.data.Effect_Volume)
-        self.channel.play(self.effect_music, loops=1)
+        self.channel.set_volume(Data.data.Master_Volume * Data.data.Effect_Volume)
+        self.channel.play(self.effect_music, loops=0)
 
     def volume(self, mst, ef):
         self.channel.set_volume(mst * ef)
-        print("ef : ",  self.channel.get_volume())
+        #print("ef : ",  self.channel.get_volume())
         
     
     def stop(self):
@@ -44,21 +44,26 @@ class Effect_Music:
 
 Data.load_settings()
 
-bg_music = Background_Music(0)
-ef_music = Effect_Music(4)
+bg_music_main = Background_Music(0)
+bg_music_play = Background_Music(1)
+ef_music_draw = Effect_Music(2)
+ef_music_set = Effect_Music(3)
 
-bg_music.play()
 
 def master_volume(v_value):
-    bg_music.volume(v_value, Data.data.Music_Volume)
-    ef_music.volume(v_value, Data.data.Effect_Volume)
+    bg_music_main.volume(v_value, Data.data.Music_Volume)
+    bg_music_play.volume(v_value, Data.data.Music_Volume)
+    ef_music_draw.volume(v_value, Data.data.Effect_Volume)
+    ef_music_set.volume(v_value, Data.data.Effect_Volume)
     Data.save_sound(0, v_value)
     
 def bg_volume(v_value):
-    bg_music.volume(Data.data.Master_Volume, v_value)
+    bg_music_main.volume(v_value, Data.data.Music_Volume)
+    bg_music_play.volume(v_value, Data.data.Music_Volume)
     Data.save_sound(1, v_value)
     
 def ef_volume(v_value):
-    ef_music.volume(Data.data.Master_Volume, v_value)
+    ef_music_draw.volume(v_value, Data.data.Effect_Volume)
+    ef_music_set.volume(v_value, Data.data.Effect_Volume)
     Data.save_sound(2, v_value)
 
