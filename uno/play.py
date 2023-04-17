@@ -57,7 +57,7 @@ class Playing(Display):
         self.up_arrow = pg.transform.scale(pg.image.load("./assets/images/up_arrow.png"), (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx])))
         self.down_arrow = pg.transform.scale(pg.image.load("./assets/images/down_arrow.png"), (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx])))
         self.right_arrow = pg.transform.scale(pg.image.load("./assets/images/right_arrow.png"), (int(30*C.WEIGHT[Display.display_idx]), int(14*C.WEIGHT[Display.display_idx])))
-
+        self.winner = Text((300, 300), 60, '', C.BLACK)
         # Load Setting
         self.name_input_box.change_text(Data.data.name)
         self.my_name = Data.data.name
@@ -333,7 +333,7 @@ class Playing(Display):
         else: # ai
             if player.can_play(self.game.current_card) and Playing.game.is_active:
                 # 30 - random
-                if 1800 - self.time < 60*random.uniform(2, 4):
+                if 1800 - self.time < 60*random.uniform(0.1, 0.2):
                     pass
                 else:
                     for i, card in enumerate(player.hand):
@@ -428,7 +428,9 @@ class Playing(Display):
                                     self.choice_card_idx = self.key_locate
                                     self.key_locate = 0
                             elif idx == 5: # escape
-                                self.mode[C.NEXT_SCREEN] = C.STOP
+                                #self.mode[C.NEXT_SCREEN] = C.STOP
+                                self.is_game_start = False
+                                self.win = True
                             else:
                                 if self.Color_active:
                                     if idx == 6:
@@ -471,39 +473,53 @@ class Playing(Display):
                 if self.x >= 500:
                     self.x = 0
                     self.y += 100
-        else: # 로비화면
-            self.screen.fill((255, 255, 255))
-            pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
-                                                int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
-            self.start_button.draw(self.screen)
-            self.update_screen(pg.mouse.get_pos())
-            if self.win:
-                pass
-                #Playing.game._winner
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    running[0] = False
-                    return
-                elif (event.type == pg.MOUSEBUTTONDOWN) and not self.input_active:
-                    for idx, item in enumerate(self.Player_list):
-                        if item.above:
-                            item.click((idx, item))
-                    if self.start_button.above:
-                        self.start_button.click()
-                    if self.name_input_box.above:
-                        self.input_active = True
-                elif event.type == pg.KEYUP:
-                    if self.input_active:
-                        if event.key == pg.K_BACKSPACE:
-                            self.my_name = self.my_name[:-1]
-                        elif event.key == pg.K_RETURN:
-                            Data.save_name(self.my_name)
-                            self.input_active = False
-                        elif event.unicode.isalpha() and len(self.my_name)<=6:
-                            self.my_name += event.unicode
-                    else:
-                        if event.key == Data.data.KEY_Settings[5]:
-                            self.mode[C.NEXT_SCREEN] = C.STOP
+        else:
+            if self.win: # 승리 화면 마우스를 클릭하거나 키를 누르면 시작 메뉴로 돌아감
+                self.screen.fill((255, 255, 255))
+                self.winner.change_size(Display.display_idx)
+                #self.winner.change_text(Playing.game._winner)
+                self.winner.change_text(str(self.game.current_player.player_id)+'th player win')
+                self.winner.draw(self.screen)
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        print("END")
+                    elif event.type == pg.KEYUP:
+                        print("END")
+            else: # 대기실
+                self.screen.fill((255, 255, 255))
+                pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
+                                                    int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
+                self.start_button.draw(self.screen)
+                self.update_screen(pg.mouse.get_pos())
+                if self.win:
+                    pass
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
+                    elif (event.type == pg.MOUSEBUTTONDOWN) and not self.input_active:
+                        for idx, item in enumerate(self.Player_list):
+                            if item.above:
+                                item.click((idx, item))
+                        if self.start_button.above:
+                            self.start_button.click()
+                        if self.name_input_box.above:
+                            self.input_active = True
+                    elif event.type == pg.KEYUP:
+                        if self.input_active:
+                            if event.key == pg.K_BACKSPACE:
+                                self.my_name = self.my_name[:-1]
+                            elif event.key == pg.K_RETURN:
+                                Data.save_name(self.my_name)
+                                self.input_active = False
+                            elif event.unicode.isalpha() and len(self.my_name)<=6:
+                                self.my_name += event.unicode
+                        else:
+                            if event.key == Data.data.KEY_Settings[5]:
+                                self.mode[C.NEXT_SCREEN] = C.STOP
                     
 
 
