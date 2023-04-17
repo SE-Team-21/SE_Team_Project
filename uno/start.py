@@ -12,6 +12,7 @@ class Start(Display):
         self.Button_list.append(Button((100, 300), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((100, 450), (120, 60), 'Quit', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
+        Music.bg_music_main.play()
 
     def next_screen(self, idx, running):
         if idx == 0:                            
