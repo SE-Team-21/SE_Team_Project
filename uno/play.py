@@ -156,7 +156,7 @@ class Playing(Display):
         self.backCard.draw(self.screen, 100, 100)
         self.draw_color_selection()
 
-    def card_motion(self, idx):
+    def card_motion(self, idx): # 카드 내는거
         fps = 120
         target_x = 150
         target_y = 100
@@ -184,7 +184,7 @@ class Playing(Display):
                 current_y -= (start_y - target_y)/fps
                 pg.display.update()
 
-    def pick_up_motion(self, idx):
+    def pick_up_motion(self, idx): # 카드 뽑는거
         fps = 120
         start_x = 150
         start_y = 100
@@ -305,7 +305,7 @@ class Playing(Display):
                             print("Player {} played {}".format(player, card))
                             self.card_motion(0)
                             self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
-                            if self.card.card_type == 'reverse':
+                            if card.card_type == 'reverse':
                                 self.draw_circle()
                             self.choice_card_idx = None
                             self.time = 1800
