@@ -140,6 +140,7 @@ class Playing(Display):
                 self.y += 100
         self.update_screen(pg.mouse.get_pos())
         self.draw_computer_back()
+        self.draw_arrow()
         self.Uno_Button.draw(self.screen)
         self.top.draw(self.screen, 150, 100)
         self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
