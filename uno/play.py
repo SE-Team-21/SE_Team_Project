@@ -58,6 +58,8 @@ class Playing(Display):
         self.down_arrow = pg.transform.scale(pg.image.load("./assets/images/down_arrow.png"), (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx])))
         self.right_arrow = pg.transform.scale(pg.image.load("./assets/images/right_arrow.png"), (int(30*C.WEIGHT[Display.display_idx]), int(14*C.WEIGHT[Display.display_idx])))
         self.winner = Text((300, 300), 60, '', C.BLACK)
+        self.circle = pg.transform.scale(pg.image.load("./assets/images/circle.png"), (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
+        self.uncircle = pg.transform.scale(pg.image.load("./assets/images/uncircle.png"), (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
         # Load Setting
         self.name_input_box.change_text(Data.data.name)
         self.my_name = Data.data.name
@@ -75,6 +77,12 @@ class Playing(Display):
 
 
     '''
+    def draw_circle(self):
+        if self.game._player_cycle._reverse:
+            self.screen.blit(pg.transform.scale(self.circle, (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx]))), (int(300*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
+        else:
+            self.screen.blit(pg.transform.scale(self.uncircle, (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx]))), (int(300*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
+        pg.time.wait(1000)
     def draw_arrow(self):
         if self.game._player_cycle._reverse: # 화살표 위로
             self.screen.blit(pg.transform.scale(self.up_arrow, (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx]))), (int(550*C.WEIGHT[Display.display_idx]), int(40*C.WEIGHT[Display.display_idx])))
@@ -297,6 +305,8 @@ class Playing(Display):
                             print("Player {} played {}".format(player, card))
                             self.card_motion(0)
                             self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
+                            if self.card.card_type == 'reverse':
+                                self.draw_circle()
                             self.choice_card_idx = None
                             self.time = 1800
                             
