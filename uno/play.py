@@ -188,7 +188,7 @@ class Playing(Display):
 
     def pick_up_motion(self, idx): # 카드 뽑는거
         fps = 120
-        start_x = 150
+        start_x = 100
         start_y = 100
         current_x = start_x
         current_y = start_y
