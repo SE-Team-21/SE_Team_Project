@@ -158,6 +158,32 @@ class Playing(Display):
             current_y -= (start_y - target_y)/fps
             pg.display.update()
 
+    def pick_up_motion(self, idx):
+        fps = 120
+        start_x = 100
+        start_y = 100
+        current_x = start_x
+        current_y = start_y
+        if idx == 0: # 내가 뽑을 때
+            locate = len(self.Card_list)
+            target_x = 50*(locate%10)
+            target_y = 300 + (locate//10)*100
+            for i in range(fps):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
+                pg.display.update()
+        else: # 컴퓨터가 뽑을 때
+            target_x = 640
+            target_y = 50 + 90*idx
+            for i in range(fps):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
+                pg.display.update()
+
     def click_uno(self, who):
         print("click uno button, player ", who)
         valid = -1
@@ -258,9 +284,8 @@ class Playing(Display):
         else:
             print("Player {} picked up".format(player))
             self.game.play(player=player_id, card=None)
-            pg.time.wait(2000)
+            self.pick_up_motion(0)
             self.time = 1800
-
 
     def game_handler(self, running): # main
         if Playing.game == None:
@@ -310,6 +335,7 @@ class Playing(Display):
                 print("Computer {} picked up".format(player))
                 self.game.play(player=player_id, card=None)
                 self.time = 1800
+                self.pick_up_motion(player_id)
 
     def single_mode(self, running):
         if self.is_game_start: # 인게임화면
