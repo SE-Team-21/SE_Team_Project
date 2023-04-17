@@ -32,13 +32,9 @@ class CardButton:
             if params:
                 self.function(*params)
             else:
-                self.function()
+                self.function()'''
 
     def change_size(self, weight_idx):
         self.FONT = pg.font.SysFont(C.FONT, int(C.DEFAULT_SIZE*C.WEIGHT[weight_idx]))
         self.rect = pg.Rect(0, 0, *tuple(int(item*C.WEIGHT[weight_idx]) for item in self.size))
         self.pos = tuple(int(item*C.WEIGHT[weight_idx]) for item in self.default_pos)
-        self.text = self.FONT.render(self.button_text, True, self.text_color)
-        self.text_rect = self.text.get_rect(center=self.pos)
-        self.rect.center = self.pos
-        '''

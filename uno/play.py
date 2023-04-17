@@ -53,9 +53,9 @@ class Playing(Display):
         self.name_infor = Text((140, 256), 20, 'Only Alphabet up to 7 char and Enter', C.BLACK)
         self.my_name = 'You'
         self.input_active = False
-        self.up_arrow = pg.image.load("./assets/images/up_arrow.png")
-        self.down_arrow = pg.image.load("./assets/images/down_arrow.png")
-        self.right_arrow = pg.image.load("./assets/images/right_arrow.png")
+        self.up_arrow = pg.transform.scale(pg.image.load("./assets/images/up_arrow.png"), (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx])))
+        self.down_arrow = pg.transform.scale(pg.image.load("./assets/images/down_arrow.png"), (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx])))
+        self.right_arrow = pg.transform.scale(pg.image.load("./assets/images/right_arrow.png"), (int(30*C.WEIGHT[Display.display_idx]), int(14*C.WEIGHT[Display.display_idx])))
 
         # Load Setting
         self.name_input_box.change_text(Data.data.name)
@@ -76,12 +76,12 @@ class Playing(Display):
     '''
     def draw_arrow(self):
         if self.game._player_cycle._reverse: # 화살표 위로
-            self.screen.blit(self.up_arrow, (550, 80))
+            self.screen.blit(pg.transform.scale(self.up_arrow, (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx]))), (int(550*C.WEIGHT[Display.display_idx]), int(40*C.WEIGHT[Display.display_idx])))
         else: # 화살표 아래로
-            self.screen.blit(self.down_arrow, (550, 80))
+            self.screen.blit(pg.transform.scale(self.down_arrow, (int(42*C.WEIGHT[Display.display_idx]), int(500*C.WEIGHT[Display.display_idx]))), (int(550*C.WEIGHT[Display.display_idx]), int(40*C.WEIGHT[Display.display_idx])))
         id = self.game.current_player.player_id
         if id == 0:
-            self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 50))
+            self.screen.blit(pg.transform.scale(self.right_arrow, (int(30*C.WEIGHT[Display.display_idx]), int(14*C.WEIGHT[Display.display_idx]))), (int(580*C.WEIGHT[Display.display_idx]), int(60*C.WEIGHT[Display.display_idx])))
         else:
             idx = 0
             for i in self.is_computer_activated:
@@ -92,7 +92,7 @@ class Playing(Display):
                     idx += 1
                 if id == 0:
                     break
-            self.screen.blit(pg.transform.scale(self.right_arrow, (30,60)), (580, 50+90*idx))
+            self.screen.blit(pg.transform.scale(self.right_arrow, (int(30*C.WEIGHT[Display.display_idx]), int(14*C.WEIGHT[Display.display_idx]))), (int(580*C.WEIGHT[Display.display_idx]), int((60+90*idx)*C.WEIGHT[Display.display_idx])))
 
     def draw_color_selection(self):
         if self.game.current_card.color == 'red': # 현재 색깔 표시
@@ -113,6 +113,19 @@ class Playing(Display):
             elif self.game.current_card.temp_color == 'blue':
                 pg.draw.rect(self.screen, C.BLUE, (100, 50, 50, 50))
     
+    def draw_computer_back(self):
+        x_ = int(640*C.WEIGHT[Display.display_idx])
+        y_ = int(140*C.WEIGHT[Display.display_idx])
+        index = 0
+        for idx in range(5):
+            if self.is_computer_activated[idx]:
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (int(30*C.WEIGHT[Display.display_idx]),int(60*C.WEIGHT[Display.display_idx]))), (x_, y_))
+                self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
+                self.Text_list[idx].change_size(Display.display_idx)
+                self.Text_list[idx].draw(self.screen)
+                index += 1
+            y_ += int(90*C.WEIGHT[Display.display_idx])
+
     def temp(self):
         self.screen.fill((255, 255, 255))
         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
@@ -126,17 +139,7 @@ class Playing(Display):
                 self.x = 0
                 self.y += 100
         self.update_screen(pg.mouse.get_pos())
-        x_ = 640
-        y_ = 140
-        index = 0
-
-        for idx in range(5):
-            if self.is_computer_activated[idx]:
-                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (x_, y_))
-                self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
-                self.Text_list[idx].draw(self.screen)
-                index += 1
-            y_ += 90
+        self.draw_computer_back()
         self.Uno_Button.draw(self.screen)
         self.top.draw(self.screen, 150, 100)
         self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
@@ -376,17 +379,7 @@ class Playing(Display):
                 if self.x >= 500:
                     self.x = 0
                     self.y += 100
-            x_ = 640
-            y_ = 140
-            index = 0
-
-            for idx in range(5):
-                if self.is_computer_activated[idx]:
-                    self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (x_, y_))
-                    self.Text_list[idx].change_text(str(len(Playing.game.players[index + 1].hand)) + " Card(s) in hand")
-                    self.Text_list[idx].draw(self.screen)
-                    index += 1
-                y_ += 90
+            self.draw_computer_back()
             self.draw_arrow()
             self.draw_color_selection()
             self.Uno_Button.draw(self.screen)

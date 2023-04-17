@@ -53,10 +53,6 @@ class Story(Display):
             self.mode[C.NEXT_SCREEN] = C.START
 
     def next_screen_2(self, idx, running):
-        if Playing.game == None:
-                Playing.game = UnoGame(5) # game inst
-        else:
-            pass
         '''if idx==0:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
         if idx==1:
