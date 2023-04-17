@@ -19,7 +19,7 @@ class Pause(Display):
             self.mode[C.PREV_SCREEN] = C.STOP
         elif idx==2:
             self.mode[C.NEXT_SCREEN] = C.START
-            Playing.game = None
+            C.IS_GAME_END = True
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))

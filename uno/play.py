@@ -147,16 +147,29 @@ class Playing(Display):
         fps = 120
         target_x = 100
         target_y = 100
-        start_x = 640
-        start_y = 50 + 90*idx
-        current_x = start_x
-        current_y = start_y
-        for i in range(fps):
-            self.temp()
-            self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
-            current_x -= (start_x - target_x)/fps
-            current_y -= (start_y - target_y)/fps
-            pg.display.update()
+        if idx == 0:
+            locate = self.choice_card_idx
+            start_x = 50*(locate%10)
+            start_y = 300 + (locate//10)*100
+            current_x = start_x
+            current_y = start_y
+            for i in range(fps):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS[str(Playing.game.players[0].hand[self.choice_card_idx].color) + str(Playing.game.players[0].hand[self.choice_card_idx].card_type)], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
+                pg.display.update()
+        else:
+            start_x = 640
+            start_y = 50 + 90*idx
+            current_x = start_x
+            current_y = start_y
+            for i in range(fps):
+                self.temp()
+                self.screen.blit(pg.transform.scale(C.ALL_CARDS["Back"], (30,60)), (current_x, current_y))
+                current_x -= (start_x - target_x)/fps
+                current_y -= (start_y - target_y)/fps
+                pg.display.update()
 
     def pick_up_motion(self, idx):
         fps = 120
@@ -247,6 +260,7 @@ class Playing(Display):
     
     def game_start(self):
         self.is_game_start = True
+        C.IS_GAME_END = False
 
     def player_action(self, running):
         player = self.game.current_player
@@ -276,10 +290,11 @@ class Playing(Display):
                         else:
                             new_color = None
                             print("Player {} played {}".format(player, card))
+                            self.card_motion(0)
                             self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
                             self.choice_card_idx = None
                             self.time = 1800
-                            self.card_motion(0)
+                            
         
         else:
             print("Player {} picked up".format(player))

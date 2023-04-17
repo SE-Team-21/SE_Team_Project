@@ -15,6 +15,9 @@ def uno_mainloop():
     running = [True]
     while running[0]:
         Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
+        if C.IS_GAME_END:
+            Game[2] = Playing()
+            C.IS_GAME_END = False
     pg.quit()
 
 if __name__ == "__main__":
