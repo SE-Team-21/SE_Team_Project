@@ -99,8 +99,11 @@ class Setting(Display):
         Display.display_idx = Data.data.Resolution
         Display.colorblind_idx = Data.data.Color
         self.Slider_list[0].s = Data.data.Master_Volume
+        Music.master_volume(0.5)
         self.Slider_list[1].s = Data.data.Music_Volume
+        Music.bg_volume(0.5)
         self.Slider_list[2].s = Data.data.Effect_Volume
+        Music.ef_volume(0.5)
         self.active[0] = False
         self.active[1] = True
         self.active[2] = False
