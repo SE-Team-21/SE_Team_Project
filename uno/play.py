@@ -345,7 +345,17 @@ class Playing(Display):
 
     def game_handler(self, running): # main
         if self.game == None:
-            self.game = UnoGame(self.num_of_players)
+            if C.game_mode == 0:
+                self.game = UnoGame(self.num_of_players)
+            else:
+                if C.INDEX == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
+                    pass
+                elif C.INDEX == 1:#지역 B 나포함 4명 첫 카드 빼고 다 나눠 주기
+                    pass
+                elif C.INDEX == 2:# 지역 C 나포함3명 5턴마다 필드위 색상 바꾸기
+                    pass
+                elif C.INDEX == 3:# 지역 나포함 3명 상대 50% 증가 / 기술 콤보 / 매 턴마다 색상 바뀜
+                    pass
         self.top = CardButton(str(self.game.current_card.color) + str(self.game.current_card.card_type), 
                               C.ALL_CARDS[str(self.game.current_card.color) + str(self.game.current_card.card_type)])
         for i in self.game.players[0].hand:
