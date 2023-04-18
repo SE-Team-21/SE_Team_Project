@@ -380,9 +380,9 @@ class Playing(Display):
                                 else:
                                     new_color = None
                                 print("Computer {} played {}".format(player, card))
+                                self.card_motion(player_id)
                                 self.game.play(player=player_id, card=i, new_color=new_color)
                                 self.time = 1800
-                                self.card_motion(player_id)
                                 if self.game.is_active == False:
                                     self.is_game_start = False
                                     self.win = True
@@ -393,9 +393,9 @@ class Playing(Display):
                             self.click_uno(player_id)
             elif self.game.is_active:
                 print("Computer {} picked up".format(player))
+                self.pick_up_motion(player_id)
                 self.game.play(player=player_id, card=None)
                 self.time = 1800
-                self.pick_up_motion(player_id)
 
     def single_mode(self, running):
         if self.is_game_start: # 인게임화면
