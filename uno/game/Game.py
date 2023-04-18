@@ -8,6 +8,7 @@ import copy
 
 class UnoGame:
     def __init__(self, players, probability=-1, init_deal_cnt= 7, unit_test_deck=None, random=True):
+        self.tmp = True
         self.init_deal_cnt = init_deal_cnt
         self.probability = probability
         if not isinstance(players, int):
@@ -86,7 +87,7 @@ class UnoGame:
 
     @property
     def is_active(self):
-        return all(len(player.hand) > 0 for player in self.players)
+        return all(len(player.hand) > 0 for player in self.players) and self.tmp
 
     @property
     def current_player(self):
@@ -167,7 +168,7 @@ class UnoGame:
         else:
             winner_name = self.players.index(self.winner)
         print("Player {} wins!".format(winner_name))
-        self.is_active = False
+        self.tmp = True
 
     def _pick_up(self, player, n):
         player.uno_state = False
