@@ -160,7 +160,7 @@ class Playing(Display):
         self.draw_color_selection()
 
     def card_motion(self, idx): # 카드 내는거
-        fps = 120
+        fps = 60
         target_x = 150
         target_y = 100
         Music.ef_music_set.play()
@@ -199,7 +199,7 @@ class Playing(Display):
                 pg.display.update()
 
     def pick_up_motion(self, idx): # 카드 뽑는거
-        fps = 120
+        fps = 60
         start_x = 100
         start_y = 100
         current_x = start_x
@@ -379,7 +379,7 @@ class Playing(Display):
         else: # ai
             if player.can_play(self.game.current_card) and self.game.is_active:
                 # 30 - random
-                if 1800 - self.time < 60*random.uniform(0.1, 0.2):
+                if 1800 - self.time < 60*random.uniform(1, 3):
                     pass
                 else:
                     for i, card in enumerate(player.hand):
@@ -636,13 +636,10 @@ class Playing(Display):
                     if event.type == pg.QUIT:
                         running[0] = False
                         return
-                    elif (event.type == pg.MOUSEBUTTONDOWN) or (event.type == pg.KEYUP):
-                        self.mode[C.NEXT_SCREEN] = C.START
-                        if self.game._winner.player_id == 0:
-                            Data.save_story(C.INDEX)
-                            if C.INDEX == 3:
-                                Data.save_clear()
-                        C.IS_GAME_END = True
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        print("END")
+                    elif event.type == pg.KEYUP:
+                        print("END")
         else:
             for event in pg.event.get():
                 self.tmp_event = event
@@ -728,6 +725,7 @@ class Playing(Display):
         pg.time.Clock().tick(60)
         if self.is_game_start:
             if self.time <= 0:
+                self.game.play(self.game.current_player.player_id)
                 self.time = 1800
             else:
                 self.time -= 1
