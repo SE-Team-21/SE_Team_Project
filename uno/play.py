@@ -553,7 +553,7 @@ class Playing(Display):
                         for idx, item in enumerate(self.Player_list):
                             if item.above:
                                 item.click((idx, item))
-                        if self.start_button.above:
+                        if self.start_button.above and self.number_of_players>=2:
                             self.start_button.click()
                         if self.name_input_box.above:
                             self.input_active = True
