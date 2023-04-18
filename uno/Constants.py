@@ -25,6 +25,7 @@ IS_GAME_END = False
 NEXT_SCREEN = 0
 PREV_SCREEN = 1
 game_mode = 0
+INDEX = 0
 # Default Size of Button and Text
 DEFAULT_SIZE = 20
 

@@ -125,6 +125,7 @@ class Story(Display):
                     if self.yes_button.above:
                         self.phase = 1
                         C.game_mode = 1
+                        C.INDEX = self.index
                         self.next_screen_2()
                         '''if Data.data.Story<=2 and (self.index == Data.data.Story):
                             self.clear[Data.data.Story] = True

@@ -565,7 +565,150 @@ class Playing(Display):
 
 
     def story_mode(self, stage, running):
-        pass
+        if self.is_game_start == False:
+            if stage == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
+                self.num_of_players += 1
+                self.is_computer_activated[0] = True
+            elif stage == 1: #지역 B 나포함 4명 첫 카드 빼고 다 나눠 주기
+                self.num_of_players += 3
+                self.is_computer_activated[0] = True
+                self.is_computer_activated[1] = True
+                self.is_computer_activated[2] = True
+            elif stage == 2: # 지역 C 나포함3명 5턴마다 필드위 색상 바꾸기
+                self.num_of_players += 2
+                self.is_computer_activated[0] = True
+                self.is_computer_activated[1] = True
+            elif stage == 3: # 지역 나포함 3명 상대 50% 증가 / 기술 콤보 / 매 턴마다 색상 바뀜
+                self.num_of_players += 2
+                self.is_computer_activated[0] = True
+                self.is_computer_activated[1] = True
+            self.is_game_start = True
+        self.win = False
+        self.screen.fill((255, 255, 255))
+        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
+                                            int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
+        self.Card_list = []
+        self.x = 0
+        self.y = 300
+        self.game_handler(running)
+        for item in self.Card_list:
+            item.draw(self.screen, self.x, self.y)
+            self.x += 50
+            if self.x >= 500:
+                self.x = 0
+                self.y += 100
+        self.update_screen(pg.mouse.get_pos())
+        self.x = 0
+        self.y = 300
+        for item in self.Card_list:
+            item.draw(self.screen, self.x, self.y)
+            self.x += 50
+            if self.x >= 500:
+                self.x = 0
+                self.y += 100
+        self.draw_computer_back()
+        self.draw_arrow()
+        self.draw_color_selection()
+        self.Uno_Button.draw(self.screen)
+        if self.key_locate is not None:
+            self.Card_list[self.key_locate].on_key = True
+        if self.Color_active:
+            for item in self.Color_list:
+                item.update(pg.mouse.get_pos())
+                item.draw(self.screen)
+        if self.win: # 승리 화면 마우스를 클릭하거나 키를 누르면 시작 메뉴로 돌아감 여기서 저장해야됨
+                self.screen.fill((255, 255, 255))
+                self.winner.change_size(Display.display_idx)
+                #self.winner.change_text(self.game._winner)
+                self.winner.change_text(str(self.game.current_player.player_id)+'th player win')
+                self.winner.draw(self.screen)
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        print("END")
+                    elif event.type == pg.KEYUP:
+                        print("END")
+        else:
+            for event in pg.event.get():
+                self.tmp_event = event
+                if event.type == pg.QUIT:
+                    running[0] = False
+                    return
+                elif event.type == pg.KEYUP:
+                    for idx, item in enumerate(Data.data.KEY_Settings):
+                        if event.key == item:
+                            if idx == 0 and self.key_locate is not None: # up
+                                if self.key_locate-10 >= 0:
+                                    self.Card_list[self.key_locate].on_key = False
+                                    self.key_locate -= 10
+                                    self.Card_list[self.key_locate].on_key = True
+                            elif idx == 1 and self.key_locate is not None: # left
+                                if self.key_locate%10 != 0:
+                                    self.Card_list[self.key_locate].on_key = False
+                                    self.key_locate -= 1
+                                    self.Card_list[self.key_locate].on_key = True
+                            elif idx == 2 and self.key_locate is not None: # down
+                                if self.key_locate+10<=len(self.Card_list)-1:
+                                    self.Card_list[self.key_locate].on_key = False
+                                    self.key_locate += 10
+                                    self.Card_list[self.key_locate].on_key = True
+                            elif idx == 3 and self.key_locate is not None: # right
+                                if (self.key_locate != len(self.Card_list)-1) and ((self.key_locate+1)%10 != 0):
+                                    self.Card_list[self.key_locate].on_key = False
+                                    self.key_locate += 1
+                                    self.Card_list[self.key_locate].on_key = True
+                            elif idx == 4 and self.key_locate is not None: # return
+                                if self.game.current_card.playable(self.game.players[0].hand[self.key_locate]):
+                                    self.choice_card_idx = self.key_locate
+                                    self.key_locate = 0
+                            elif idx == 5: # escape
+                                self.mode[C.NEXT_SCREEN] = C.STOP
+                                #self.is_game_start = False
+                                #self.win = True
+                            else:
+                                if self.Color_active:
+                                    if idx == 6:
+                                        self.Color_idx = 0
+                                    elif idx == 7:
+                                        self.Color_idx = 1
+                                    elif idx == 8:
+                                        self.Color_idx = 2
+                                    elif idx == 9:
+                                        self.Color_idx = 3
+                                    print(self.Color_idx)
+                                    self.Color_active = False
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if self.tmp_event.type == pg.QUIT:
+                        running[0] = False
+                        return
+                    elif self.tmp_event.type == pg.KEYUP:
+                        if self.tmp_event.key == pg.K_ESCAPE:
+                            self.mode[C.NEXT_SCREEN] = C.STOP
+                    elif self.tmp_event.type == pg.MOUSEBUTTONDOWN:
+                        if self.game:
+                            if self.Color_active:
+                                print(2)
+                                for idx, item in enumerate(self.Color_list):
+                                    if item.above:
+                                        self.Color_idx = idx
+                            else:
+                                for idx, item in enumerate(self.Card_list):
+                                    if item.above:
+                                        print(item.card_name)
+                                        self.choice_card_idx = idx
+                                        break
+                                if self.Uno_Button.above:
+                                    self.Uno_Button.click((0, ))
+            self.x = 0
+            self.y = 300
+            for item in self.Card_list:
+                item.draw(self.screen, self.x, self.y)
+                self.x += 50
+                if self.x >= 500:
+                    self.x = 0
+                    self.y += 100
 
     def main_loop(self, running):
         # game inst
@@ -578,7 +721,7 @@ class Playing(Display):
         if C.game_mode == 0:
             self.single_mode(running)
         elif C.game_mode == 1:
-            self.story_mode(self.stage, running)
+            self.story_mode(C.INDEX, running)
         if Display.colorblind_idx != -1:
             self.color()
         pg.display.update()
