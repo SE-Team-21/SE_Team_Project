@@ -11,10 +11,10 @@ class Story(Display):
     def __init__(self):
         super().__init__()
         self.Area_list = []
-        self.Area_list.append(Button((162, 112), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
-        self.Area_list.append(Button((302, 321), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
-        self.Area_list.append(Button((567, 112), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
-        self.Area_list.append(Button((666, 357), (150, 150), '', lambda x,y: self.next_screen_2(x,y)))
+        self.Area_list.append(Button((162, 112), (150, 150), ''))
+        self.Area_list.append(Button((302, 321), (150, 150), ''))
+        self.Area_list.append(Button((567, 112), (150, 150), ''))
+        self.Area_list.append(Button((666, 357), (150, 150), ''))
         self.Checked_list = []
         self.Checked_list.append(Text((120, 84), 40, 'Clear', C.BLACK))
         self.Checked_list.append(Text((260, 296), 40, 'Clear', C.BLACK))
@@ -52,15 +52,8 @@ class Story(Display):
         if idx==0:
             self.mode[C.NEXT_SCREEN] = C.START
 
-    def next_screen_2(self, idx, running):
-        '''if idx==0:
-            self.mode[C.NEXT_SCREEN] = C.PLAYING
-        if idx==1:
-            self.mode[C.NEXT_SCREEN] = C.PLAYING
-        if idx==2:
-            self.mode[C.NEXT_SCREEN] = C.PLAYING
-        if idx==3:
-            self.mode[C.NEXT_SCREEN] = C.PLAYING'''
+    def next_screen_2(self):
+        self.mode[C.NEXT_SCREEN] = C.PLAYING
 
     def update_area(self, mouse_pos):	
         for item in self.Area_list:	
@@ -113,7 +106,6 @@ class Story(Display):
                             item.click((idx, running))
                     for idx, item in enumerate(self.Area_list):
                         if item.above and self.active[idx]:
-                            item.click((idx, running))
                             self.index = idx
                             item.on_key = True
                             self.phase = 2
@@ -132,14 +124,16 @@ class Story(Display):
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if self.yes_button.above:
                         self.phase = 1
-                        if Data.data.Story<=2 and (self.index == Data.data.Story):
+                        C.game_mode = 1
+                        self.next_screen_2()
+                        '''if Data.data.Story<=2 and (self.index == Data.data.Story):
                             self.clear[Data.data.Story] = True
                             Data.save_story(Data.data.Story+1)
                         elif self.index == 3:
                             self.clear[Data.data.Story] = True
                             Data.save_clear()
                         for i in range(Data.data.Story+1):
-                            self.active[i]=True
+                            self.active[i]=True'''
                     elif self.no_button.above:
                         self.phase = 1
                         self.index = None

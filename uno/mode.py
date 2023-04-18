@@ -16,10 +16,10 @@ class Mode(Display):
     def next_screen(self, idx, running):
         if idx == 0:
             self.mode[C.NEXT_SCREEN] = C.STORY
-            Playing.game_mode = 1
+            C.game_mode = 1
         elif idx == 1:
             self.mode[C.NEXT_SCREEN] = C.PLAYING
-            Playing.game_mode = 0
+            C.game_mode = 0
         elif idx == 2:
             self.mode[C.NEXT_SCREEN] = C.START
     

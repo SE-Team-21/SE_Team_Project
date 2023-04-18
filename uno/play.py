@@ -386,6 +386,8 @@ class Playing(Display):
                                 if self.game.is_active == False:
                                     self.is_game_start = False
                                     self.win = True
+                                    self.key_locate = None
+                                    print("win")
                                     break
                                 break
                     if 1800 -self.time < 60*random.uniform(0.8, 1):
@@ -426,7 +428,8 @@ class Playing(Display):
             self.draw_arrow()
             self.draw_color_selection()
             self.Uno_Button.draw(self.screen)
-            self.Card_list[self.key_locate].on_key = True
+            if self.key_locate is not None:
+                self.Card_list[self.key_locate].on_key = True
             if self.Color_active:
                 for item in self.Color_list:
                     item.update(pg.mouse.get_pos())
@@ -439,27 +442,27 @@ class Playing(Display):
                 elif event.type == pg.KEYUP:
                     for idx, item in enumerate(Data.data.KEY_Settings):
                         if event.key == item:
-                            if idx == 0: # up
+                            if idx == 0 and self.key_locate is not None: # up
                                 if self.key_locate-10 >= 0:
                                     self.Card_list[self.key_locate].on_key = False
                                     self.key_locate -= 10
                                     self.Card_list[self.key_locate].on_key = True
-                            elif idx == 1: # left
+                            elif idx == 1 and self.key_locate is not None: # left
                                 if self.key_locate%10 != 0:
                                     self.Card_list[self.key_locate].on_key = False
                                     self.key_locate -= 1
                                     self.Card_list[self.key_locate].on_key = True
-                            elif idx == 2: # down
+                            elif idx == 2 and self.key_locate is not None: # down
                                 if self.key_locate+10<=len(self.Card_list)-1:
                                     self.Card_list[self.key_locate].on_key = False
                                     self.key_locate += 10
                                     self.Card_list[self.key_locate].on_key = True
-                            elif idx == 3: # right
+                            elif idx == 3 and self.key_locate is not None: # right
                                 if (self.key_locate != len(self.Card_list)-1) and ((self.key_locate+1)%10 != 0):
                                     self.Card_list[self.key_locate].on_key = False
                                     self.key_locate += 1
                                     self.Card_list[self.key_locate].on_key = True
-                            elif idx == 4: # return
+                            elif idx == 4 and self.key_locate is not None: # return
                                 if self.game.current_card.playable(self.game.players[0].hand[self.key_locate]):
                                     self.choice_card_idx = self.key_locate
                                     self.key_locate = 0
@@ -572,9 +575,9 @@ class Playing(Display):
                 self.time = 1800
             else:
                 self.time -= 1
-        if self.game_mode == 0:
+        if C.game_mode == 0:
             self.single_mode(running)
-        elif self.game_mode == 1:
+        elif C.game_mode == 1:
             self.story_mode(self.stage, running)
         if Display.colorblind_idx != -1:
             self.color()
