@@ -393,7 +393,7 @@ class Playing(Display):
                                 self.card_motion(player_id)
                                 self.game.play(player=player_id, card=i, new_color=new_color)
                                 self.time = 1800
-                                if self.game.is_active == False:
+                                if self.game.tmp == False:
                                     self.is_game_start = False
                                     self.win = True
                                     self.key_locate = None
