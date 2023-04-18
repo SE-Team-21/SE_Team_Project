@@ -16,8 +16,10 @@ class UnoGame:
             raise ValueError('Invalid game: must be between 2 and 15 players')
         if unit_test_deck is None:
             self.deck = self._create_deck(random)
-            while self.current_card.color not in COLORS:
+            print(self.deck[-1 * init_deal_cnt * players - 1].color)
+            while self.deck[-1 * init_deal_cnt * players - 1].color == "black":
                 self.deck = self._create_deck(random)
+                print(self.deck[-1 * init_deal_cnt * players - 1].color)
         else:
             self.deck = unit_test_deck
             self.deck_full = copy.deepcopy(self.deck)
