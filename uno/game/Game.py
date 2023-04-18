@@ -168,7 +168,7 @@ class UnoGame:
         else:
             winner_name = self.players.index(self.winner)
         print("Player {} wins!".format(winner_name))
-        self.tmp = True
+        self.tmp = False
 
     def _pick_up(self, player, n):
         player.uno_state = False
