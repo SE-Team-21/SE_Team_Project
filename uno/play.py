@@ -553,7 +553,7 @@ class Playing(Display):
                         for idx, item in enumerate(self.Player_list):
                             if item.above:
                                 item.click((idx, item))
-                        if self.start_button.above and self.number_of_players>=2:
+                        if self.start_button.above and self.num_of_players>=2:
                             self.start_button.click()
                         if self.name_input_box.above:
                             self.input_active = True
@@ -636,10 +636,13 @@ class Playing(Display):
                     if event.type == pg.QUIT:
                         running[0] = False
                         return
-                    elif event.type == pg.MOUSEBUTTONDOWN:
-                        print("END")
-                    elif event.type == pg.KEYUP:
-                        print("END")
+                    elif (event.type == pg.MOUSEBUTTONDOWN) or (event.type == pg.KEYUP):
+                        self.mode[C.NEXT_SCREEN] = C.START
+                        if self.game._winner.player_id == 0:
+                            Data.save_story(C.INDEX)
+                            if C.INDEX == 3:
+                                Data.save_clear()
+                        C.IS_GAME_END = True
         else:
             for event in pg.event.get():
                 self.tmp_event = event
