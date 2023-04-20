@@ -346,7 +346,7 @@ class Playing(Display):
     def game_handler(self, running): # main
         if self.game == None:
             if C.game_mode == 0:
-                self.game = UnoGame(self.num_of_players)
+                self.game = UnoGame(self.num_of_players, -1, 20)
             else:
                 if C.INDEX == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
                     self.game = UnoGame(2, 50)

@@ -9,8 +9,8 @@ def Encrypt(text): # 클라이언트에서 비밀번호를 암호화해서 서�
     return hashlib.sha256(text.encode()).hexdigest()
 
 def Check(text):
-    pw_hash = hashlib.sha256(pw.encode()) # 서버에 저장된 비밀번호와 비교해서
-    return text == pw_hash.hexdigest() # 같으면 return True
+    pw_hash = hashlib.sha256(pw.encode())
+    return text == pw_hash.hexdigest()
 
 # print(Encrypt(''))
 # print(Check(Encrypt('abcd')))
@@ -35,10 +35,10 @@ def decrypt(nonce, ciphertext, tag):
     except:
         return False
     
-nonce, ciphertext, tag = encrypt(input('Enter a message: '))
+'''nonce, ciphertext, tag = encrypt(input('Enter a message: '))
 plaintext = decrypt(nonce, ciphertext, tag)
 print(f'Cipher text: {ciphertext}')
 if not plaintext:
     print('Message is corrupted')
 else:
-    print(f'Plain text: {plaintext}')
+    print(f'Plain text: {plaintext}')'''
