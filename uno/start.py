@@ -9,7 +9,8 @@ class Start(Display):
     def __init__(self):
         super().__init__()
         self.Button_list.append(Button((100, 150), (120, 60), 'Play', lambda x,y: self.next_screen(x,y)))
-        self.Button_list.append(Button((100, 300), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 250), (120, 60), 'Options', lambda x,y: self.next_screen(x,y)))
+        self.Button_list.append(Button((100, 350), (120, 60), 'Achievement', lambda x,y: self.next_screen(x,y)))
         self.Button_list.append(Button((100, 450), (120, 60), 'Quit', lambda x,y: self.next_screen(x,y)))
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
         Music.bg_music_main.play()
@@ -21,6 +22,9 @@ class Start(Display):
             self.mode[C.NEXT_SCREEN] = C.SETTING
             self.mode[C.PREV_SCREEN] = C.START
         elif idx == 2:
+            self.mode[C.NEXT_SCREEN] = C.ACHIEVEMENT
+            self.mode[C.PREV_SCREEN] = C.START
+        elif idx == 3:
             running[0] = False
     
     def main_loop(self, running):

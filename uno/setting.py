@@ -82,10 +82,7 @@ class Setting(Display):
 
         
     def next_screen(self, not_use, running):
-        if self.mode[C.PREV_SCREEN] == C.START:
-            self.mode[C.NEXT_SCREEN] = C.START
-        elif self.mode[C.PREV_SCREEN] == C.STOP:
-            self.mode[C.NEXT_SCREEN] = C.STOP
+        self.mode[C.NEXT_SCREEN] = self.mode[C.PREV_SCREEN]
         self.key_set = False
 
     def button_setting(self, idx, not_use):

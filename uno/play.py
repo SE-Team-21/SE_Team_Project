@@ -163,6 +163,8 @@ class Playing(Display):
         fps = 60
         target_x = 150
         target_y = 100
+        if self.game.is_active:
+            print(self.game.is_active)
         Music.ef_music_set.play()
         if idx == 0:
             locate = self.choice_card_idx
@@ -346,7 +348,7 @@ class Playing(Display):
     def game_handler(self, running): # main
         if self.game == None:
             if C.game_mode == 0:
-                self.game = UnoGame(self.num_of_players, -1, 20)
+                self.game = UnoGame(self.num_of_players, -1, 2)
             else:
                 if C.INDEX == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
                     self.game = UnoGame(2, 50)

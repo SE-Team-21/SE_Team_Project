@@ -6,12 +6,13 @@ from uno.pause import Pause
 from uno.story import Story
 from uno.mode import Mode
 from uno.play import Playing
+from uno.achievement import Achievement
 import uno.Constants as C
 
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
-    Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story()]
+    Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story(), Achievement()]
     running = [True]
     while running[0]:
         Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
