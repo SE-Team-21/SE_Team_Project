@@ -333,6 +333,11 @@ class Playing(Display):
                             print("Player {} played {}".format(player, card))
                             self.card_motion(0)
                             self.game.play(player=player_id, card=self.choice_card_idx, new_color=new_color)
+                            if self.game.tmp == False:
+                                    self.is_game_start = False
+                                    self.win = True
+                                    self.key_locate = None
+                                    print("win")
                             if card.card_type == 'reverse':
                                 self.draw_circle()
                             self.choice_card_idx = None
@@ -348,10 +353,10 @@ class Playing(Display):
     def game_handler(self, running): # main
         if self.game == None:
             if C.game_mode == 0:
-                self.game = UnoGame(self.num_of_players, -1, 2)
+                self.game = UnoGame(self.num_of_players, -1, 7)
             else:
                 if C.INDEX == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
-                    self.game = UnoGame(2, 50)
+                    self.game = UnoGame(2, -1, 2)
                 elif C.INDEX == 1:#지역 B 나포함 4명 첫 카드 빼고 다 나눠 주기
                     self.game = UnoGame(4, -1, 25)
                 elif C.INDEX == 2:# 지역 C 나포함3명 5턴마다 필드위 색상 바꾸기
@@ -535,10 +540,8 @@ class Playing(Display):
                     if event.type == pg.QUIT:
                         running[0] = False
                         return
-                    elif event.type == pg.MOUSEBUTTONDOWN:
-                        print("END")
-                    elif event.type == pg.KEYUP:
-                        print("END")
+                    elif event.type == pg.MOUSEBUTTONDOWN or event.type == pg.KEYUP:
+                        self.mode[C.NEXT_SCREEN] = C.START
             else: # 대기실
                 self.screen.fill((255, 255, 255))
                 pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
@@ -595,7 +598,6 @@ class Playing(Display):
                 self.is_computer_activated[0] = True
                 self.is_computer_activated[1] = True
             self.is_game_start = True
-        self.win = False
         self.screen.fill((255, 255, 255))
         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
@@ -638,10 +640,9 @@ class Playing(Display):
                     if event.type == pg.QUIT:
                         running[0] = False
                         return
-                    elif event.type == pg.MOUSEBUTTONDOWN:
-                        print("END")
-                    elif event.type == pg.KEYUP:
-                        print("END")
+                    elif event.type == pg.MOUSEBUTTONDOWN or event.type == pg.KEYUP:
+                        self.mode[C.NEXT_SCREEN] = C.START
+                        Data.save_story(Data.data.Story+1)
         else:
             for event in pg.event.get():
                 self.tmp_event = event

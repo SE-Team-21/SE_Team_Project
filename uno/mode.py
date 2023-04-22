@@ -9,7 +9,8 @@ class Mode(Display):
     def __init__(self):
         super().__init__()
         self.Button_list.append(Button((100, 150), (120, 60), 'Story Mode', lambda x,y: self.next_screen(x,y)))  #스토리모드 선택
-        self.Button_list.append(Button((100, 300), (120, 60), 'Single Mode', lambda x,y: self.next_screen(x,y)))  #싱글모드 선택
+        self.Button_list.append(Button((100, 250), (120, 60), 'Single Play', lambda x,y: self.next_screen(x,y)))  #싱글모드 선택
+        self.Button_list.append(Button((100, 350), (120, 60), 'Multi Play', lambda x,y: self.next_screen(x,y)))  #싱글모드 선택
         self.Button_list.append(Button((100, 450), (120, 60), 'Back', lambda x,y: self.next_screen(x,y)))  #시작 화면 되돌아가기
         self.backgroundimg = pg.transform.scale(pg.image.load("./assets/images/Main.png"), C.DISPLAY_SIZE[Display.display_idx])
 
@@ -21,6 +22,8 @@ class Mode(Display):
             self.mode[C.NEXT_SCREEN] = C.PLAYING
             C.game_mode = 0
         elif idx == 2:
+            pass
+        elif idx == 3:
             self.mode[C.NEXT_SCREEN] = C.START
     
     def main_loop(self, running):
