@@ -1,10 +1,9 @@
 from socket import *
 import encryption as E
 from datetime import datetime
-import errno
 
 clientSock = socket(AF_INET, SOCK_STREAM)
-clientSock.connect(('comunix.seoultech.ac.kr', 10123))
+clientSock.connect(('13.210.238.200', 10123))
 
 print('연결 확인 됐습니다.')
 while True:
