@@ -12,20 +12,25 @@ from uno.Text_Class import Text
 class Multi(Display):
     def __init__(self):
         super().__init__()
-        self.Button_list.append(Button((100, 150), (120, 60), 'Make Room', self.connect))
-        self.Button_list.append(Button((300, 150), (120, 60), 'Connect Room', self.send))
-        self.Button_list.append(Button((500, 150), (120, 60), '3', self.send))
-        self.Text_list.append(Text((690, 160), 20, '', C.BLACK))
+        self.button_create_game = Button((100, 150), (120, 60), 'Create Game', color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True)
+        self.button_reload = Button((300, 150), (60, 52), '', color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True)
+        self.reload_img = pg.transform.scale(pg.image.load("./assets/images/reload.png"), (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx])))
+        self.Room_list = []
         self.connection = False
         self.clientSock = None
         self.password = ''
         self.input_active = False
         self.pw_input_box = Button((710, 70), (160, 80), self.password)
+        self.start_tick = 0
+        self.start_text = Text((300, 200), 40, 'Connecting to server.', C.BLACK)
+        self.connect_fail = False
+        self.host = False
+        self.data = None
 
     def connect(self):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
-        #self.clientSock.connect(('13.210.238.200', 10123))
-        self.clientSock.connect(('127.0.0.1', 10123))
+        self.clientSock.connect(('13.210.238.200', 10123))
+        #self.clientSock.connect(('127.0.0.1', 10123))
         self.clientSock.setblocking(False)
         print('연결 확인 됐습니다.')
     
@@ -45,49 +50,87 @@ class Multi(Display):
     def get_game_state(self): # 게임 진행 상태 요청
         self.clientSock.send(E.Encrypt_A({"Type": "ggs"}))
 
-    def draw_connect_motion(self):
-        self.screen.fill((255, 255, 255))
-        text = Text((400, 300), 40, 'Connecting .', C.BLACK)
-        text.draw(self.screen)
-        pg.display.update()
-        time.sleep(1)
-        text.change_text('Connecting ..')
-        text.draw(self.screen)
-        pg.display.update()
-        time.sleep(1)
-        text.change_text('Connecting ...')
-        text.draw(self.screen)
-        pg.display.update()
-        time.sleep(1)
-        text.change_text('Connecting .')
-        text.draw(self.screen)
-        pg.display.update()
-        time.sleep(1)
-
     def next_screen(self, idx, running):
         pass
 
     def main_loop(self, running):
-        if self.connection is False: # 서버 연결
-            self.draw_connect_motion()
-            try:
-                self.connect()
-                self.connection = True
-            except:
-                pass
+        pg.time.Clock().tick(60)
+        if not self.connection: # 서버 연결
+            if not self.connect_fail:
+                if self.start_tick == 0:
+                    self.screen.fill((255, 255, 255))
+                    self.start_text.draw(self.screen)
+                    pg.display.update()
+                elif self.start_tick == 60:
+                    self.screen.fill((255, 255, 255))
+                    self.start_text.change_text('Connecting to server..')
+                    self.start_text.draw(self.screen)
+                    pg.display.update()
+                elif self.start_tick == 120:
+                    self.screen.fill((255, 255, 255))
+                    self.start_text.change_text('Connecting to server...')
+                    self.start_text.draw(self.screen)
+                    pg.display.update()
+                elif self.start_tick == 180:
+                    self.screen.fill((255, 255, 255))
+                    self.start_text.change_text('Connecting to server.')
+                    self.start_text.draw(self.screen)
+                    pg.display.update()
+                elif self.start_tick == 240:
+                    try:
+                        self.connect()
+                        self.connection = True
+                    except:
+                        self.connect_fail = True
+                self.start_tick += 1
+                if self.connection or self.connect_fail:
+                    self.start_tick = 0
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
+            else: # 서버 연결 실패시 예외처리
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
         else:
+            self.screen.fill((184, 248, 251))
             self.pw_input_box.update(pg.mouse.get_pos())
-            self.screen.fill((255, 255, 255))
             self.pw_input_box.draw(self.screen)
+            self.button_reload.update(pg.mouse.get_pos())
+            self.button_reload.draw(self.screen)
+            self.button_create_game.update(pg.mouse.get_pos())
+            self.button_create_game.draw(self.screen)
+            for room in self.Room_list:
+                        room.update(pg.mouse.get_pos())
+                        room.draw(self.screen)
+            if self.data is not None:
+                if self.data["Type"] == "rs":
+                    self.Room_list = []
+                    x = 100
+                    y = 300
+                    for i in range(self.data["Num"]):
+                        self.Room_list.append(Button((x, y), (200, 60), self.data[str(i)][0], color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True))
+                        y += 90
+                    for room in self.Room_list:
+                        room.update(pg.mouse.get_pos())
+                        room.draw(self.screen)
+                    self.data = None
+                elif self.data["Type"] == "ip":
+                    print("Host's IP Address : ", self.data["address"])
+                    self.data = None
+            self.screen.blit(pg.transform.scale(self.reload_img, (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx]))), (int(270*C.WEIGHT[Display.display_idx]), int(124*C.WEIGHT[Display.display_idx])))
             self.update_screen(pg.mouse.get_pos())
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running[0] = False
                     return
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    for idx, item in enumerate(self.Button_list):
-                        if item.above:
-                            item.click()
+                    if self.button_create_game.above:
+                        pass
+                    if self.button_reload.above:
+                        self.get_room_state()
                     if self.pw_input_box.above:
                                 self.input_active = True
                 elif event.type == pg.KEYUP:
@@ -111,7 +154,7 @@ class Multi(Display):
                                 self.pw_input_box.change_text(temp)
             if self.clientSock is not None:
                 try:
-                    data = self.clientSock.recv(1024).decode('utf-8')
-                    print('받은 데이터 : ', data)
+                    self.data = E.Decrypt_A(self.clientSock.recv(1024))
+                    print('받은 데이터 : ', self.data)
                 except:
                     pass

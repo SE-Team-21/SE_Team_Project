@@ -2,24 +2,24 @@ import pygame as pg
 import uno.Constants as C
 
 class Button:
-    def __init__(self, pos, size, button_text, function = None, color = C.BLACK, locate = False): # pos = 버튼 중앙 좌표, size = (가로, 세로), button_text = 내용
+    def __init__(self, pos, size, button_text, function = None, color = C.BLACK, locate = False, inactive_color = C.INACTIVE_COLOR, above_color = C.ABOVE_COLOR, bold = False): # pos = 버튼 중앙 좌표, size = (가로, 세로), button_text = 내용
         pg.font.init()
         self.default_pos = pos
         self.pos = pos
         self.size = size
         self.button_text = button_text
         self.text_color = color
-        self.FONT = pg.font.SysFont(C.FONT, C.DEFAULT_SIZE)
+        self.FONT = pg.font.SysFont(C.FONT, C.DEFAULT_SIZE, bold)
         self.text = self.FONT.render(button_text, True, self.text_color)
         self.text_rect = self.text.get_rect(center=pos)
         self.rect = pg.Rect(0, 0, *size)
         self.rect.center = pos
-        self.color = C.INACTIVE_COLOR
+        self.color = inactive_color
         self.function = function
         self.above = False
         self.on_key = False
-        self.INACTIVE_COLOR = C.INACTIVE_COLOR
-        self.ABOVE_COLOR = C.ABOVE_COLOR
+        self.INACTIVE_COLOR = inactive_color
+        self.ABOVE_COLOR = above_color
         self.locate = locate
     
     def update(self, mouse_pos):
