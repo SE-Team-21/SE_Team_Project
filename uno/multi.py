@@ -26,18 +26,23 @@ class Multi(Display):
         self.clientSock.setblocking(False)
         print('연결 확인 됐습니다.')
     
-    def disconnect(self):
+    def disconnect(self): # 서버에 연결 끊음 요청
         self.clientSock.send(E.Encrypt_A({"Type": "exit"}))
         self.clientSock = None
 
-    def send(self, password):
+    def send(self, password): # 방 Password 전송
         self.clientSock.send(E.Encrypt_A({"Type": "pw", "Password": E.Encrypt_S(password)}))
+    
+    def get_room_state(self): # 대기실 상태 요청
+        self.clientSock.send(E.Encrypt_A({"Type": "grs"}))
+    
+    def get_game_state(self): # 게임 진행 상태 요청
+        self.clientSock.send(E.Encrypt_A({"Type": "ggs"}))
+
+
 
     def next_screen(self, idx, running):
         pass
-    
-    def get_room_state(self):
-        self.clientSock.send(E.Encrypt_A({"Type": "grs"}))
 
     def main_loop(self, running):
         self.screen.fill((255, 255, 255))
