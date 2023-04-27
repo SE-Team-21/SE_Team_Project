@@ -22,10 +22,16 @@ class Multi(Display):
         self.input_active = False
         self.pw_input_box = Button((710, 70), (160, 80), self.password)
         self.start_tick = 0
-        self.start_text = Text((300, 200), 40, 'Connecting to server.', C.BLACK)
+        self.start_text = Text((200, 200), 40, 'Connecting to server.', C.BLACK)
         self.connect_fail = False
         self.host = False
         self.data = None
+        self.lobby = True
+        self.is_game_start = False
+        self.my_name = ''
+
+        # Load Setting
+        self.my_name = Data.data.name
 
     def connect(self):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
@@ -38,11 +44,12 @@ class Multi(Display):
         self.clientSock.send(E.Encrypt_A({"Type": "exit"}))
         self.clientSock = None
 
-    def send(self, password): # 방 Password 전송 / 입장용
+    def send_password(self, password): # 방 Password 전송 / 입장용
         self.clientSock.send(E.Encrypt_A({"Type": "pw", "Password": E.Encrypt_S(password)}))
 
     def make_room(self, password): # 방 생성
         self.clientSock.send(E.Encrypt_A({"Type": "mkr", "Password": E.Encrypt_S(password)}))
+        self.host = True
     
     def get_room_state(self): # 대기실 상태 요청
         self.clientSock.send(E.Encrypt_A({"Type": "grs"}))
@@ -50,9 +57,16 @@ class Multi(Display):
     def get_game_state(self): # 게임 진행 상태 요청
         self.clientSock.send(E.Encrypt_A({"Type": "ggs"}))
 
+    def quit_room(self): # 방에서 퇴장
+        self.clientSock.send(E.Encrypt_A({"Type": "qr"}))
+        self.host = False
+        
+    def send_name(self): # 내 이름을 서버에 전송
+        self.clientSock.send(E.Encrypt_A({"Type": "sn", "Name": self.my_name}))
+
     def next_screen(self, idx, running):
         pass
-
+    
     def main_loop(self, running):
         pg.time.Clock().tick(60)
         if not self.connection: # 서버 연결
@@ -95,63 +109,71 @@ class Multi(Display):
                         running[0] = False
                         return
         else:
-            self.screen.fill((184, 248, 251))
-            self.pw_input_box.update(pg.mouse.get_pos())
-            self.pw_input_box.draw(self.screen)
-            self.button_reload.update(pg.mouse.get_pos())
-            self.button_reload.draw(self.screen)
-            self.button_create_game.update(pg.mouse.get_pos())
-            self.button_create_game.draw(self.screen)
-            for room in self.Room_list:
-                        room.update(pg.mouse.get_pos())
-                        room.draw(self.screen)
-            if self.data is not None:
-                if self.data["Type"] == "rs":
-                    self.Room_list = []
-                    x = 100
-                    y = 300
-                    for i in range(self.data["Num"]):
-                        self.Room_list.append(Button((x, y), (200, 60), self.data[str(i)][0], color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True))
-                        y += 90
-                    for room in self.Room_list:
-                        room.update(pg.mouse.get_pos())
-                        room.draw(self.screen)
-                    self.data = None
-                elif self.data["Type"] == "ip":
-                    print("Host's IP Address : ", self.data["address"])
-                    self.data = None
-            self.screen.blit(pg.transform.scale(self.reload_img, (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx]))), (int(270*C.WEIGHT[Display.display_idx]), int(124*C.WEIGHT[Display.display_idx])))
-            self.update_screen(pg.mouse.get_pos())
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    running[0] = False
-                    return
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    if self.button_create_game.above:
-                        pass
-                    if self.button_reload.above:
-                        self.get_room_state()
-                    if self.pw_input_box.above:
-                                self.input_active = True
-                elif event.type == pg.KEYUP:
-                        if self.input_active:
-                            if event.key == pg.K_BACKSPACE:
-                                self.password = self.password[:-1]
-                                temp = ''
-                                for i in self.password:
-                                    temp+='*'
-                                self.pw_input_box.change_text(temp)
-                            elif event.key == pg.K_RETURN and len(self.password)>=6:
-                                self.input_active = False
-                                self.make_room(self.password)
-                                print(self.password)
-                                self.password = ''
-                            elif (event.unicode.isalpha() or event.unicode.isdigit()) and len(self.password)<=12:
-                                self.password += event.unicode
-                                temp = ''
-                                for i in self.password:
-                                    temp+='*'
-                                self.pw_input_box.change_text(temp)
+            if self.lobby: # 로비 화면
+                self.screen.fill((184, 248, 251))
+                self.pw_input_box.update(pg.mouse.get_pos())
+                self.pw_input_box.draw(self.screen)
+                self.button_reload.update(pg.mouse.get_pos())
+                self.button_reload.draw(self.screen)
+                self.button_create_game.update(pg.mouse.get_pos())
+                self.button_create_game.draw(self.screen)
+                for room in self.Room_list:
+                            room.update(pg.mouse.get_pos())
+                            room.draw(self.screen)
+                if self.data is not None:
+                    if self.data["Type"] == "rs":
+                        self.Room_list = []
+                        x = 100
+                        y = 300
+                        for i in range(self.data["Num"]):
+                            self.Room_list.append(Button((x, y), (200, 60), self.data[str(i)][0], color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True))
+                            y += 90
+                        for room in self.Room_list:
+                            room.update(pg.mouse.get_pos())
+                            room.draw(self.screen)
+                        self.data = None
+                    elif self.data["Type"] == "ip":
+                        print("Host's IP Address : ", self.data["address"])
+                        self.data = None
+                self.screen.blit(pg.transform.scale(self.reload_img, (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx]))), (int(270*C.WEIGHT[Display.display_idx]), int(124*C.WEIGHT[Display.display_idx])))
+                self.update_screen(pg.mouse.get_pos())
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        running[0] = False
+                        return
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        if self.button_create_game.above:
+                            pass
+                        if self.button_reload.above:
+                            self.get_room_state()
+                        if self.pw_input_box.above:
+                                    self.input_active = True
+                    elif event.type == pg.KEYUP:
+                            if self.input_active:
+                                if event.key == pg.K_BACKSPACE:
+                                    self.password = self.password[:-1]
+                                    temp = ''
+                                    for i in self.password:
+                                        temp+='*'
+                                    self.pw_input_box.change_text(temp)
+                                elif event.key == pg.K_RETURN and len(self.password)>=6:
+                                    self.input_active = False
+                                    self.make_room(self.password)
+                                    print(self.password)
+                                    self.password = ''
+                                    self.lobby = False
+                                    return
+                                elif (event.unicode.isalpha() or event.unicode.isdigit()) and len(self.password)<=12:
+                                    self.password += event.unicode
+                                    temp = ''
+                                    for i in self.password:
+                                        temp+='*'
+                                    self.pw_input_box.change_text(temp)
+            else:
+                if self.is_game_start: # 게임 시작 후 화면
+                    pass
+                else: # 대기실 화면
+                    pass
             if self.clientSock is not None:
                 try:
                     self.data = E.Decrypt_A(self.clientSock.recv(1024))
