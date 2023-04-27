@@ -49,6 +49,25 @@ while True:
                     for idx, room in enumerate(rooms):
                         data[idx] = [room.address, len(room.players)]
                     player[0].send(E.Encrypt_A(data))
-                    pass
+                elif data["Type"] == "gma":
+                    player[0].send(E.Encrypt_A({"Type": "myip", "address": player[1][0]}))
+                elif data["Type"] == "exit":
+                    for room in rooms:
+                        if player in room.players:
+                            room.players.remove(player)
+                            if len(room.players) == 0:
+                                rooms.remove(room)
+                            else: # 다른 사람에게 방장 넘겨줌
+                                pass
+                            break
+
         except:
             players.remove(player)
+            for room in rooms:
+                if player in room.players:
+                    room.players.remove(player)
+                    if len(room.players) == 0:
+                                rooms.remove(room)
+                    else: # 다른 사람에게 방장 넘겨줌
+                        pass
+                    break
