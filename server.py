@@ -15,9 +15,10 @@ rooms = []
 num = 0
 
 class Room:
-    def __init__(self, pw, add, top):
+    def __init__(self, pw, add, port, top):
         self.password = pw
         self.address = add
+        self.port = port
         self.players = []
         self.players.append(top)
 
@@ -36,18 +37,21 @@ while True:
             for sock in readable:
                 data = E.Decrypt_A(sock.recv(1024))
                 if data["Type"] == "mkr":
-                    rooms.append(Room(data["Password"], player[1][0], player))
+                    rooms.append(Room(data["Password"], player[1][0], player[1][1], player))
                     player[0].send(E.Encrypt_A({"Type": "ip", "address": player[1][0]}))
                 elif data["Type"] == "pw":
-                    if Check(data["Password"], rooms[0].password):
-                        player[0].send(str(datetime.now()).encode('utf-8'))
-                    else:
-                        player[0].send('Password initialize or incorrect'.encode('utf-8'))
+                    for room in rooms:
+                        if room.address == data["Host_IP"] and room.port == data["Host_PORT"]:
+                            if Check(data["Password"], room.password):
+                                room.players.append(player)
+                                player[0].send(E.Encrypt_A({"Type": "Correct"}))
+                            else:
+                                player[0].send(E.Encrypt_A({"Type": "Incorrect"}))
                 elif data["Type"] == "grs":
                     player[0].send(player[1][0].encode('utf-8'))
                     data = {"Type": "rs", "Num": len(rooms)}
                     for idx, room in enumerate(rooms):
-                        data[idx] = [room.address, len(room.players)]
+                        data[idx] = [room.address, len(room.players), room.port]
                     player[0].send(E.Encrypt_A(data))
                 elif data["Type"] == "gma":
                     player[0].send(E.Encrypt_A({"Type": "myip", "address": player[1][0]}))
