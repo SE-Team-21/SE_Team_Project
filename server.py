@@ -21,6 +21,7 @@ class Room:
         self.port = port
         self.players = []
         self.players.append(top)
+        self.num_of_com = 0
 
 
 while True:
@@ -43,10 +44,15 @@ while True:
                     for room in rooms:
                         if room.address == data["Host_IP"] and room.port == data["Host_PORT"]:
                             if Check(data["Password"], room.password):
-                                room.players.append(player)
-                                player[0].send(E.Encrypt_A({"Type": "Correct"}))
-                            else:
+                                if room.num_of_com + len(room.players) <= 6:
+                                    room.players.append(player)
+                                    player[0].send(E.Encrypt_A({"Type": "Correct"}))
+                                else: # 방에 자리가 없을 때
+                                    pass
+                            else: # 비밀번호가 틀렸을 때
                                 player[0].send(E.Encrypt_A({"Type": "Incorrect"}))
+                        else: # 방을 찾지 못했을 때
+                            pass
                 elif data["Type"] == "grs":
                     player[0].send(player[1][0].encode('utf-8'))
                     data = {"Type": "rs", "Num": len(rooms)}
