@@ -16,8 +16,7 @@ def uno_mainloop():
     Game = [Start(), Setting(), Playing(), Pause(), Mode(), Story(), Achievement(), Multi()]
     running = [True]
     while running[0]:
-        #Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
-        Game[7].main_loop(running)
+        Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
         if C.IS_GAME_END:
             Game[2] = Playing()
             C.IS_GAME_END = False
