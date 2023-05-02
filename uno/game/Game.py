@@ -24,6 +24,7 @@ class UnoGame:
         else:
             self.deck = unit_test_deck
             self.deck_full = copy.deepcopy(self.deck)
+        self.turn = 0
 
         self.all_card_cnt = len(self.deck_full)
         self.tech_card_cnt = 0
