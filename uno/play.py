@@ -381,6 +381,7 @@ class Playing(Display):
         player = self.game.current_player
         player_id = player.player_id
         if player_id == 0: # 나
+            self.game.turn += 1
             self.player_action(running)
             # here
         else: # ai
@@ -531,6 +532,10 @@ class Playing(Display):
                     self.y += 100
         else:
             if self.win: # 승리 화면 마우스를 클릭하거나 키를 누르면 시작 메뉴로 돌아감
+                if Data.data.djqwjr[0] == 0:
+                    Data.save_djqwjr(0, 1)
+                if C.game_mode == 0 and Data.data.djqwjr[2] == 0 and self.game.turn <= 10:
+                    Data.save_djqwjr(2, 1)
                 self.screen.fill((255, 255, 255))
                 self.winner.change_size(Display.display_idx)
                 #self.winner.change_text(self.game._winner)
