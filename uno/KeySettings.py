@@ -10,6 +10,7 @@ class Data:
         self.Color = -1
         self.Clear = False
         self.name = 'You'
+        self.djqwjr = [0, 0, 0, 0, 0, 0, 0, 0]
         self.load_settings()
         #self.Master_Volume = 0.5
         #self.Music_Volume = 0.5
@@ -20,6 +21,11 @@ class Data:
         with open('data.pkl', 'wb') as f:
             dill.dump(Data.data, f)
     
+    @staticmethod
+    def save_djqwjr(idx, status = 0):
+        Data.data.djqwjr[idx] = status
+        Data.save()
+
     @staticmethod
     def save_key(idx, key):
         Data.data.KEY_Settings[idx] = key
@@ -48,6 +54,7 @@ class Data:
     @staticmethod
     def save_story(idx):
         Data.data.Story = idx
+        Data.data.djqwjr[1] = idx
         Data.save()
 
     @staticmethod
