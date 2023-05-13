@@ -25,7 +25,7 @@ class Multi(Display):
         self.button_cancel = Button((500, 450), (120, 60), 'Cancel')
         self.button_join = Button((300, 450), (120, 60), 'Join')
         self.pw_type = None
-        self.start_tick = 0
+        self.start_tick = 239
         self.start_text = Text((200, 200), 40, 'Connecting to server.', C.BLACK)
         self.connect_fail = False
         self.host = False
@@ -62,8 +62,8 @@ class Multi(Display):
 
     def connect(self):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
-        self.clientSock.connect(('13.210.238.200', 10123))
-        #self.clientSock.connect(('127.0.0.1', 10123))
+        #self.clientSock.connect(('13.210.238.200', 10123))
+        self.clientSock.connect(('127.0.0.1', 10123))
         self.clientSock.setblocking(False)
         print('연결 확인 됐습니다.')
         self.get_my_address()
@@ -94,6 +94,9 @@ class Multi(Display):
         
     def send_name(self): # 내 이름을 서버에 전송
         self.clientSock.send(E.Encrypt_A({"Type": "sn", "Name": self.my_name}))
+
+    def game_start(self):
+        self.clientSock.send(E.Encrypt_A({"Type": "game_start"}))
 
     def next_screen(self, idx, running):
         pass
@@ -285,6 +288,7 @@ class Multi(Display):
                         room.update(pg.mouse.get_pos())
                         room.draw(self.screen)
                     if self.data is not None:
+                        print(self.data["Type"])
                         if self.data["Type"] == "rs":
                             self.Room_list = []
                             x = 100
@@ -332,6 +336,9 @@ class Multi(Display):
                         if self.data is not None:
                             if self.data["Type"] == "add":
                                 pass
+                            if self.data["Type"] == "game_start":
+                                print(self.data)
+                                self.data = None
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
@@ -346,8 +353,9 @@ class Multi(Display):
                                 for idx, item in enumerate(self.Player_list):
                                     if item.above:
                                         item.click((idx, item))
-                                if self.start_button.above and self.num_of_players>=2:
+                                if self.start_button.above and self.num_of_players>=1:
                                     self.start_button.click()
+                                    
                                 if self.name_input_box.above:
                                     self.input_active1 = True
                             elif event.type == pg.KEYUP:
@@ -363,11 +371,41 @@ class Multi(Display):
                                     if event.key == Data.data.KEY_Settings[5]:
                                         self.mode[C.NEXT_SCREEN] = C.STOP
                     else: # 클라이언트일 때
+                        if self.data is not None:
+                            if self.data["Type"] == "game_start":
+                                print(self.data)
+                                self.data = None
+                        self.screen.fill((255, 255, 255))
+                        pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
+                                                            int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
+                        self.start_button.draw(self.screen)
+                        self.update_screen1(pg.mouse.get_pos())
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
                                 running[0] = False
                                 self.disconnect()
                                 return
+                            elif (event.type == pg.MOUSEBUTTONDOWN) and not self.input_active1:
+                                for idx, item in enumerate(self.Player_list):
+                                    if item.above:
+                                        item.click((idx, item))
+                                if self.start_button.above and self.num_of_players>=1:
+                                    self.start_button.click()
+                                if self.name_input_box.above:
+                                    self.input_active1 = True
+                            elif event.type == pg.KEYUP:
+                                if self.input_active1:
+                                    if event.key == pg.K_BACKSPACE:
+                                        self.my_name = self.my_name[:-1]
+                                    elif event.key == pg.K_RETURN:
+                                        Data.save_name(self.my_name)
+                                        self.input_active1 = False
+                                    elif event.unicode.isalpha() and len(self.my_name)<=6:
+                                        self.my_name += event.unicode
+                                else:
+                                    if event.key == Data.data.KEY_Settings[5]:
+                                        self.mode[C.NEXT_SCREEN] = C.STOP
+                    
 
             if self.clientSock is not None:
                 try:

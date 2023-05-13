@@ -28,4 +28,10 @@ def game_start():
         else:
             print("Player {} picked up".format(player))
             game.play(player=player_id, card=None)
-game_start()
+
+
+str = '[<UnoCard object: black wildcard+10>, <UnoCard object: red 4>, <UnoCard object: blue +2>, <UnoCard object: yellow all+1>, <UnoCard object: red all+1>, <UnoCard object: black wildcard>, <UnoCard object: green 6>]'
+
+str = str.replace('[', '',).replace(']', '',).replace('<UnoCard object: ', '', 999).replace('>', '').split(', ')
+print(str)
+#game_start()
