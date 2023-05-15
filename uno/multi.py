@@ -6,6 +6,7 @@ import uno.Constants as C
 import pygame as pg
 from uno.KeySettings import Data
 from uno.Button_Class import Button
+from uno.CardButton_Class import CardButton
 from uno.Text_Class import Text
 
 class Multi(Display):
@@ -57,9 +58,12 @@ class Multi(Display):
         self.num_of_players = 1
         self.win = False
 
+        # 인게임
+        self.Card_list = []
         # Load Setting
         self.my_name = Data.data.name
-
+    
+    ### 송신
     def connect(self):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
         #self.clientSock.connect(('13.210.238.200', 10123))
@@ -97,6 +101,14 @@ class Multi(Display):
 
     def game_start(self):
         self.clientSock.send(E.Encrypt_A({"Type": "game_start"}))
+
+    ### 수신
+    def hand_out(self):
+        print(self.data)
+        self.is_game_start = True
+        for i in range(self.data["Num"]):
+            self.Card_list.append(CardButton(self.data[str(i)][0] + str(self.data[str(i)][1]), C.ALL_CARDS[self.data[str(i)][0] + str(self.data[str(i)][1])]))
+        self.data = None
 
     def next_screen(self, idx, running):
         pass
@@ -330,15 +342,29 @@ class Multi(Display):
 
             else:
                 if self.is_game_start: # 게임 시작 후 화면
-                    pass
+                    self.screen.fill((255, 255, 255))
+                    self.x = 0
+                    self.y = 300
+                    for item in self.Card_list:
+                        item.draw(self.screen, self.x, self.y)
+                        self.x += 50
+                        if self.x >= 500:
+                            self.x = 0
+                            self.y += 100
+                    pg.display.update()
+                    for event in pg.event.get():
+                        if event.type == pg.QUIT:
+                            running[0] = False
+                            self.disconnect()
+                            return
                 else: # 게임 대기실 화면
                     if self.host: # 방장일 때
                         if self.data is not None:
                             if self.data["Type"] == "add":
-                                pass
-                            if self.data["Type"] == "game_start":
-                                print(self.data)
+                                
                                 self.data = None
+                            elif self.data["Type"] == "game_start":
+                                self.hand_out()
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
@@ -372,9 +398,10 @@ class Multi(Display):
                                         self.mode[C.NEXT_SCREEN] = C.STOP
                     else: # 클라이언트일 때
                         if self.data is not None:
+                            if self.data["Type"] == "add":
+                                pass
                             if self.data["Type"] == "game_start":
-                                print(self.data)
-                                self.data = None
+                                self.hand_out()
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
