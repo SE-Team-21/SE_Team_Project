@@ -63,10 +63,17 @@ class Playing(Display):
         self.winner = Text((300, 300), 60, '', C.BLACK)
         self.circle = pg.transform.scale(pg.image.load("./assets/images/circle.png"), (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
         self.uncircle = pg.transform.scale(pg.image.load("./assets/images/uncircle.png"), (int(200*C.WEIGHT[Display.display_idx]), int(200*C.WEIGHT[Display.display_idx])))
+
         ## Multi
         self.start_button_m = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start_m())
         self.button_create_game = Button((100, 150), (120, 60), 'Create Game', color=C.WHITE, inactive_color=(0, 255, 128), above_color=(0, 229, 115), bold=True)
         self.button_reload = Button((300, 150), (60, 52), '', color=C.WHITE, inactive_color=(4, 149, 205), above_color=(119, 199, 230), bold=True)
+        self.button_area = []
+        self.button_area.append(Button((280, 300), (60, 60), 'A'))
+        self.button_area.append(Button((360, 300), (60, 60), 'B'))
+        self.button_area.append(Button((440, 300), (60, 60), 'C'))
+        self.button_area.append(Button((520, 300), (60, 60), 'D'))
+        
         self.reload_img = pg.transform.scale(pg.image.load("./assets/images/reload.png"), (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx])))
         self.Room_list = []
         self.Room_data = []
@@ -95,6 +102,8 @@ class Playing(Display):
         self.target_address = None
         self.target_port = None
         self.input_active1 = False
+        self.select = False
+        self.where = 0
         
         # Load Setting
         self.name_input_box.change_text(Data.data.name)
@@ -152,6 +161,15 @@ class Playing(Display):
         
     def card_click(self):
         self.clientSock.send(E.Encrypt_A({"Type": "card_click", "Num": self.key_locate}))
+    
+    def add_computer(self, idx, area):
+        self.clientSock.send(E.Encrypt_A({"Type": "add_computer", "Index": idx, "Area": area}))
+
+    def remove_computer(self, idx):
+        self.clientSock.send(E.Encrypt_A({"Type": "remove_computer", "Index": idx}))
+
+    def ban_player(self, idx):
+        self.clientSock.send(E.Encrypt_A({"Type": "ban_player", "Index": idx}))
         
     def game_start_m(self):
         self.clientSock.send(E.Encrypt_A({"Type": "game_start"}))
@@ -164,6 +182,7 @@ class Playing(Display):
         self.is_game_start = True
         for i in range(self.data["Num"]):
             self.Card_list.append(CardButton(self.data[str(i)][0] + str(self.data[str(i)][1]), C.ALL_CARDS[self.data[str(i)][0] + str(self.data[str(i)][1])]))
+        self.top = CardButton(self.data["top"][0] + self.data["top"][1], C.ALL_CARDS[self.data["top"][0] + self.data["top"][1]])
         self.data = None
 
 
@@ -834,7 +853,6 @@ class Playing(Display):
                         room.update(pg.mouse.get_pos())
                         room.draw(self.screen)
                     if self.data is not None:
-                        print(self.data["Type"])
                         if self.data["Type"] == "rs":
                             self.Room_list = []
                             x = 100
@@ -854,7 +872,7 @@ class Playing(Display):
                             self.text_ip.change_text(self.data["address"])
                             self.data = None
                     self.screen.blit(pg.transform.scale(self.reload_img, (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx]))), (int(270*C.WEIGHT[Display.display_idx]), int(124*C.WEIGHT[Display.display_idx])))
-                    self.update_screen(pg.mouse.get_pos())
+                    pg.display.update()
                     for event in pg.event.get():
                         if event.type == pg.QUIT:
                             running[0] = False
@@ -889,19 +907,9 @@ class Playing(Display):
                             self.x = 0
                             self.y += 100
                     self.update_screen(pg.mouse.get_pos())
-                    self.x = 0
-                    self.y = 300
-                    for item in self.Card_list:
-                        item.draw(self.screen, self.x, self.y)
-                        self.x += 50
-                        if self.x >= 500:
-                            self.x = 0
-                            self.y += 100
-                    self.draw_computer_back()
-                    self.draw_arrow()
-                    self.draw_color_selection()
-                    self.top = CardButton(self.current_card_color + self.current_card_card_type, 
-                              C.ALL_CARDS[self.current_card_color + self.current_card_card_type])
+                    #self.draw_computer_back()
+                    #self.draw_arrow()
+                    #self.draw_color_selection()
                     self.top.draw(self.screen, 150, 100)
                     self.backCard = CardButton("Back", C.ALL_CARDS["Back"])
                     self.backCard.draw(self.screen, 100, 100)
@@ -912,6 +920,7 @@ class Playing(Display):
                         for item in self.Color_list:
                             item.update(pg.mouse.get_pos())
                             item.draw(self.screen)
+                    pg.display.update()
                     for event in pg.event.get():
                         self.tmp_event = event
                         if event.type == pg.QUIT:
@@ -942,7 +951,6 @@ class Playing(Display):
                                             self.key_locate += 1
                                             self.Card_list[self.key_locate].on_key = True
                                     elif idx == 4 and self.key_locate is not None: # return
-                                        # 서버에 보내고
                                         if self.my_turn:
                                             self.card_click()
                                         '''if self.game.current_card.playable(self.game.players[0].hand[self.key_locate]): #여기
@@ -987,18 +995,15 @@ class Playing(Display):
                                                 break
                                         if self.Uno_Button.above:
                                             self.Uno_Button.click((0, ))
-                    self.x = 0
-                    self.y = 300
-                    for item in self.Card_list:
-                        item.draw(self.screen, self.x, self.y)
-                        self.x += 50
-                        if self.x >= 500:
-                            self.x = 0
-                            self.y += 100
                 else: # 게임 대기실 화면
                     if self.host: # 방장일 때
                         if self.data is not None:
                             if self.data["Type"] == "add": # 방에 새로운 사람이 들어오거나 컴퓨터 추가
+                                if self.data["is_com"]:
+                                    self.is_computer_activated[self.data["Index"]] = True
+                                    self.num_of_players += 1
+                                else:
+                                    pass
                                 self.data = None
                             elif self.data["Type"] == "remove": # 방에서 나가거나 컴퓨터 삭제
                                 self.data = None
@@ -1010,20 +1015,34 @@ class Playing(Display):
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
                         self.start_button_m.draw(self.screen)
                         self.update_screen(pg.mouse.get_pos())
+                        if self.select:
+                            for idx, item in enumerate(self.button_area):
+                                item.update(pg.mouse.get_pos())
+                                item.draw(self.screen)
+                        pg.display.update()
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
                                 running[0] = False
                                 self.disconnect()
                                 return
                             elif (event.type == pg.MOUSEBUTTONDOWN) and not self.input_active1:
-                                for idx, item in enumerate(self.Player_list):
-                                    if item.above:
-                                        item.click((idx, item))
-                                if self.start_button_m.above and self.num_of_players>=1:
-                                    self.start_button_m.click()
-                                    
-                                if self.name_input_box.above:
-                                    self.input_active1 = True
+                                if self.select:
+                                    for idx, item in enumerate(self.button_area):
+                                        if item.above:
+                                            self.add_computer(self.where, idx)
+                                            self.select = False
+                                else:
+                                    for idx, item in enumerate(self.Player_list):
+                                        if item.above:
+                                            if self.is_computer_activated[idx]:
+                                                self.remove_computer(idx)
+                                            else:
+                                                self.select = True
+                                                self.where = idx
+                                    if self.start_button_m.above and self.num_of_players>=1:
+                                        self.start_button_m.click()
+                                    if self.name_input_box.above:
+                                        self.input_active1 = True
                             elif event.type == pg.KEYUP:
                                 if self.input_active1:
                                     if event.key == pg.K_BACKSPACE:
@@ -1046,19 +1065,14 @@ class Playing(Display):
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
-                        self.start_button_m.draw(self.screen)
                         self.update_screen(pg.mouse.get_pos())
+                        pg.display.update()
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
                                 running[0] = False
                                 self.disconnect()
                                 return
                             elif (event.type == pg.MOUSEBUTTONDOWN) and not self.input_active1:
-                                for idx, item in enumerate(self.Player_list):
-                                    if item.above:
-                                        item.click((idx, item))
-                                if self.start_button_m.above and self.num_of_players>=1:
-                                    self.start_button_m.click()
                                 if self.name_input_box.above:
                                     self.input_active1 = True
                             elif event.type == pg.KEYUP:
@@ -1084,7 +1098,7 @@ class Playing(Display):
                         self.current_card_card_type = self.data['current_card_card_type']
                         # wild card +10
                         for i in range(self.data['Num']): # 각 플레이어의 핸드 개수
-                            
+                            pass
 
                         # 1. 누가 먹었는지 보내주기 vs 2. 매턴마다 모든 플레이어의 카드 보여주기
                         # 내 턴이면

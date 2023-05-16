@@ -21,10 +21,8 @@ class Room:
         self.address = add
         self.port = port
         self.game = None
-        self.players = []
-        self.players.append(top)
+        self.players = [top, None, None, None, None, None]
         self.num_of_com = 0
-        self.player = []
 
 while True:
     readable, _, _ = select.select([serverSock], [], [], 0)
@@ -40,7 +38,7 @@ while True:
             for sock in readable:
                 data = E.Decrypt_A(sock.recv(1024))
                 pid = player[0].fileno()
-                print(idx, pid)
+                print(data["Type"])
                 room = None
                 if data["Type"] == "game_start":
                     for r in rooms:
@@ -49,19 +47,30 @@ while True:
                     room.game = UnoGame(len(room.players)) # + 콤퓨타)
                     g = room.game
                     for idx, p in enumerate(room.players):
-                        print(p[0])
-                        data = {"Type": "game_start", "Num": len(g.players[idx].hand)}
-                        for i, card in enumerate(g.players[idx].hand):
-                            data[i] = [card.color, card.card_type]
-                        data["top"] = [str(g.current_card.color), str(g.current_card.card_type)]
-                        p[0].send(E.Encrypt_A(data))
-                        print("s")
-                        #p[0].send(E.Encrypt_A({"Type": "game_start", "current_player": g.current_player.player_id, "deck": str(g.players[idx].hand).replace('[', '',).replace(']', '',).replace('<UnoCard object: ', '', 999).replace('>', '').split(', '), "top": str(g.current_card)}))
+                        if p is None or p is str: # 빈자리거나 컴퓨터일 때
+                            pass
+                        else:
+                            print(p[0])
+                            data = {"Type": "game_start", "Num": len(g.players[idx].hand)}
+                            for i, card in enumerate(g.players[idx].hand):
+                                data[i] = [card.color, card.card_type]
+                            data["top"] = [str(g.current_card.color), str(g.current_card.card_type)]
+                            p[0].send(E.Encrypt_A(data))
+                            print("s")
+                            #p[0].send(E.Encrypt_A({"Type": "game_start", "current_player": g.current_player.player_id, "deck": str(g.players[idx].hand).replace('[', '',).replace(']', '',).replace('<UnoCard object: ', '', 999).replace('>', '').split(', '), "top": str(g.current_card)}))
                 elif data["Type"] == "action":
                     for room in rooms:
                         if player in room.players:
                             pass
-
+                elif data["Type"] == "add_computer":
+                    for room in rooms:
+                        if player in room.players:
+                            print("exist")
+                            if p is None or p is str: # 빈자리거나 컴퓨터일 때
+                                pass
+                            else:
+                                for p in room.players:
+                                    p[0].send(E.Encrypt_A({"Type": "add", "is_com": True, "Index": data["Index"]}))
                 elif data["Type"] == "mkr":
                     rooms.append(Room(data["Password"], player[1][0], player[1][1], player))
                     player[0].send(E.Encrypt_A({"Type": "ip", "address": player[1][0]}))
@@ -93,7 +102,7 @@ while True:
                 elif data["Type"] == "exit":
                     for room in rooms:
                         if player in room.players:
-                            room.players.remove(player)
+                            room.players.remove(player) # None으로 바꿔줘야됨
                             if len(room.players) == 0:
                                 rooms.remove(room)
                             else: # 다른 사람에게 방장 넘겨줌
