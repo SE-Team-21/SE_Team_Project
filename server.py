@@ -26,7 +26,6 @@ class Room:
         self.num_of_com = 0
         self.player = []
 
-
 while True:
     readable, _, _ = select.select([serverSock], [], [], 0)
     for sock in readable:
@@ -54,9 +53,14 @@ while True:
                         data = {"Type": "game_start", "Num": len(g.players[idx].hand)}
                         for i, card in enumerate(g.players[idx].hand):
                             data[i] = [card.color, card.card_type]
+                        data["top"] = [str(g.current_card.color), str(g.current_card.card_type)]
                         p[0].send(E.Encrypt_A(data))
+                        print("s")
                         #p[0].send(E.Encrypt_A({"Type": "game_start", "current_player": g.current_player.player_id, "deck": str(g.players[idx].hand).replace('[', '',).replace(']', '',).replace('<UnoCard object: ', '', 999).replace('>', '').split(', '), "top": str(g.current_card)}))
-                        
+                elif data["Type"] == "action":
+                    for room in rooms:
+                        if player in room.players:
+                            pass
 
                 elif data["Type"] == "mkr":
                     rooms.append(Room(data["Password"], player[1][0], player[1][1], player))

@@ -44,7 +44,7 @@ class Multi(Display):
         self.target_port = None
 
         # 대기실
-        self.start_button = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start())
+        self.start_button_m = Button((100, 100), (60, 60), 'Game Start', lambda: self.game_start_m())
         self.is_computer_activated = [False, False, False, False, False]
         self.Player_list = []
         self.Player_list.append(Button((710, 160), (160, 80), 'empty', lambda x, y: self.computer_add_remove(x, y)))

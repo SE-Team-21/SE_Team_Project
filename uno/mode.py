@@ -22,7 +22,8 @@ class Mode(Display):
             self.mode[C.NEXT_SCREEN] = C.PLAYING
             C.game_mode = 0
         elif idx == 2:
-            self.mode[C.NEXT_SCREEN] = C.MULTI
+            self.mode[C.NEXT_SCREEN] = C.PLAYING
+            C.game_mode = 2
         elif idx == 3:
             self.mode[C.NEXT_SCREEN] = C.START
     
