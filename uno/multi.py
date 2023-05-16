@@ -60,6 +60,7 @@ class Multi(Display):
 
         # 인게임
         self.Card_list = []
+        self.my_turn = False
         # Load Setting
         self.my_name = Data.data.name
     
@@ -105,6 +106,8 @@ class Multi(Display):
     ### 수신
     def hand_out(self):
         print(self.data)
+        if self.host:
+            self.my_turn = True
         self.is_game_start = True
         for i in range(self.data["Num"]):
             self.Card_list.append(CardButton(self.data[str(i)][0] + str(self.data[str(i)][1]), C.ALL_CARDS[self.data[str(i)][0] + str(self.data[str(i)][1])]))
@@ -360,11 +363,13 @@ class Multi(Display):
                 else: # 게임 대기실 화면
                     if self.host: # 방장일 때
                         if self.data is not None:
-                            if self.data["Type"] == "add":
-                                
+                            if self.data["Type"] == "add": # 방에 새로운 사람이 들어오거나 컴퓨터 추가
+                                self.data = None
+                            elif self.data["Type"] == "remove": # 방에서 나가거나 컴퓨터 삭제
                                 self.data = None
                             elif self.data["Type"] == "game_start":
                                 self.hand_out()
+                                
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
@@ -391,6 +396,7 @@ class Multi(Display):
                                     elif event.key == pg.K_RETURN:
                                         Data.save_name(self.my_name)
                                         self.input_active1 = False
+                                        self.send_name()
                                     elif event.unicode.isalpha() and len(self.my_name)<=6:
                                         self.my_name += event.unicode
                                 else:
