@@ -24,6 +24,33 @@ class Room:
         self.players = [top, None, None, None, None, None]
         self.num_of_com = 0
 
+    def broadcast_update(self):
+        data = {"Type": "update"}
+        if self.game == None:
+            for idx, p in enumerate(self.players):
+                if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
+                    data[idx] = ["Computer"+str(idx)]
+                else:
+                    data[idx] = [p.name]
+        else:
+            for idx, p in enumerate(self.players):
+                if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
+                    pass
+                else:
+                    data[idx] = [p.name, len(p.hand)]
+        for p in self.players:
+            if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
+                    pass
+            else:
+                p = p.sock
+                p[0].send(E.Encrypt_A(data))
+
+
+class Player:
+    def __init__(self, sock, name, is_computer = False):
+        self.sock = sock
+        self.name = name
+        self.is_computer = is_computer
 while True:
     readable, _, _ = select.select([serverSock], [], [], 0)
     for sock in readable:
@@ -47,6 +74,7 @@ while True:
                     room.game = UnoGame(len(room.players)) # + 콤퓨타)
                     g = room.game
                     for idx, p in enumerate(room.players):
+                        p = p.sock
                         if p is None or p is str: # 빈자리거나 컴퓨터일 때
                             pass
                         else:
@@ -69,10 +97,17 @@ while True:
                             if p is None or p is str: # 빈자리거나 컴퓨터일 때
                                 pass
                             else:
+                                data = {"Type": "update_r", "Num": len(room.players)}
                                 for p in room.players:
-                                    p[0].send(E.Encrypt_A({"Type": "add", "is_com": True, "Index": data["Index"]}))
+                                    for idx, p in enumerate(room.players):
+                                        if p is None or p is str: # 빈자리거나 컴퓨터일 때
+                                            data[idx] = False
+                                        else:
+                                            pass
+                                for p in room.players:
+                                    p[0].send(E.Encrypt_A({"Type": "update", "is_com": True, "Index": data["Index"]}))
                 elif data["Type"] == "mkr":
-                    rooms.append(Room(data["Password"], player[1][0], player[1][1], player))
+                    rooms.append(Room(data["Password"], player[1][0], player[1][1], Player(player)))
                     player[0].send(E.Encrypt_A({"Type": "ip", "address": player[1][0]}))
                 elif data["Type"] == "pw":
                     for room in rooms:
@@ -80,7 +115,7 @@ while True:
                             if Check(data["Password"], room.password):
                                 if room.num_of_com + len(room.players) <= 6:
                                     for p in room.players: # 성공적으로 방에 들어왔을 때 방에 있는 사람들에게
-                                        #p[0].send(E.Encrypt_A({"Type":"", }))
+                                        p[0].send(E.Encrypt_A({"Type":"update", "is_com": False, "Index": len(room.players)}))
                                         pass # 들어온 사람의 정보를 알려야 함
                                     room.players.append(player)
                                     player[0].send(E.Encrypt_A({"Type": "Correct"}))

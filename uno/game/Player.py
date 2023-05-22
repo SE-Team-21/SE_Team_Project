@@ -9,6 +9,9 @@ class UnoPlayer:
         self.hand = cards
         self.player_id = player_id
         self.uno_state = False
+        self.sock = None
+        self.name = ""
+        self.is_computer = False
 
     def __repr__(self):
         if self.player_id is not None:

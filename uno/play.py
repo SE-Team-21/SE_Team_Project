@@ -998,12 +998,8 @@ class Playing(Display):
                 else: # 게임 대기실 화면
                     if self.host: # 방장일 때
                         if self.data is not None:
-                            if self.data["Type"] == "add": # 방에 새로운 사람이 들어오거나 컴퓨터 추가
-                                if self.data["is_com"]:
-                                    self.is_computer_activated[self.data["Index"]] = True
-                                    self.num_of_players += 1
-                                else:
-                                    pass
+                            if self.data["Type"] == "update": # 방에 새로운 사람이 들어오거나 컴퓨터 추가
+                                pass
                                 self.data = None
                             elif self.data["Type"] == "remove": # 방에서 나가거나 컴퓨터 삭제
                                 self.data = None
@@ -1058,10 +1054,12 @@ class Playing(Display):
                                         self.mode[C.NEXT_SCREEN] = C.STOP
                     else: # 클라이언트일 때
                         if self.data is not None:
-                            if self.data["Type"] == "add":
-                                pass
+                            if self.data["Type"] == "update":
+                                pass# 새로운 유저 들어왔을 때
+                                self.data = None
                             if self.data["Type"] == "game_start":
                                 self.hand_out()
+                                self.data = None
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
