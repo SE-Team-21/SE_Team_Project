@@ -74,6 +74,14 @@ class Playing(Display):
         self.button_area.append(Button((440, 300), (60, 60), 'C'))
         self.button_area.append(Button((520, 300), (60, 60), 'D'))
         
+        self.Player_list_m = []
+        self.Player_list_m.append(Button((710, 70), (160, 80), 'empty'))
+        self.Player_list_m.append(Button((710, 160), (160, 80), 'empty'))
+        self.Player_list_m.append(Button((710, 250), (160, 80), 'empty'))
+        self.Player_list_m.append(Button((710, 340), (160, 80), 'empty'))
+        self.Player_list_m.append(Button((710, 430), (160, 80), 'empty'))
+        self.Player_list_m.append(Button((710, 520), (160, 80), 'empty'))
+        self.is_computer_activated_m = [False, False, False, False, False, False]
         self.reload_img = pg.transform.scale(pg.image.load("./assets/images/reload.png"), (int(60*C.WEIGHT[Display.display_idx]), int(52*C.WEIGHT[Display.display_idx])))
         self.Room_list = []
         self.Room_data = []
@@ -137,10 +145,10 @@ class Playing(Display):
         self.clientSock = None
 
     def send_password(self, password, host_ip, host_port): # 방 Password 전송 / 입장용
-        self.clientSock.send(E.Encrypt_A({"Type": "pw", "Password": E.Encrypt_S(password), "Host_IP": host_ip, "Host_PORT": host_port}))
+        self.clientSock.send(E.Encrypt_A({"Type": "pw", "Password": E.Encrypt_S(password), "Host_IP": host_ip, "Host_PORT": host_port, "Name": self.my_name}))
 
     def make_room(self, password): # 방 생성
-        self.clientSock.send(E.Encrypt_A({"Type": "mkr", "Password": E.Encrypt_S(password)}))
+        self.clientSock.send(E.Encrypt_A({"Type": "mkr", "Password": E.Encrypt_S(password), "Name": self.my_name}))
         self.host = True
     
     def get_room_state(self): # 대기실 상태 요청
@@ -173,6 +181,9 @@ class Playing(Display):
         
     def game_start_m(self):
         self.clientSock.send(E.Encrypt_A({"Type": "game_start"}))
+
+    def req_up(self):
+        self.clientSock.send(E.Encrypt_A({"Type": "update"}))
 
     ### 수신
     def hand_out(self):
@@ -400,11 +411,49 @@ class Playing(Display):
             item.draw(self.screen)
         for item in self.Card_list:
             item.update(mouse_pos)
-        self.start_button_m.change_size(Display.display_idx) # 수정
-        self.start_button_m.update(mouse_pos)
+        self.start_button.change_size(Display.display_idx)
+        self.start_button.update(mouse_pos)
         self.Uno_Button.change_size(Display.display_idx)
         self.Uno_Button.update(mouse_pos)
         
+    def update_screen_m(self, mouse_pos):
+        self.Timer.change_text(str(self.time//60))
+        self.Timer.change_size(Display.display_idx)
+        self.Timer.draw(self.screen)
+        if self.data is not None:
+            if self.data["Type"] == "update":
+                print(self.data)
+                for i in range(6):
+                    if self.data[str(i)] == None:
+                        self.is_computer_activated_m[i] = False
+                    else:
+                        self.is_computer_activated_m[i] = True
+                for idx, item in enumerate(self.Player_list_m):
+                    if self.is_computer_activated_m[idx]:
+                        item.INACTIVE_COLOR = C.GRAY
+                        item.locate = True
+                        item.change_text(self.data[str(idx)][0])
+                    else:
+                        item.INACTIVE_COLOR = C.WHITE
+                        item.locate = False
+                        item.change_text('empty')
+                    item.change_size(Display.display_idx)
+                    item.update(mouse_pos)
+                    item.draw(self.screen)
+                self.data = None
+        else:
+            for idx, item in enumerate(self.Player_list_m):
+                item.change_size(Display.display_idx)
+                item.update(mouse_pos)
+                item.draw(self.screen)
+        for item in self.Card_list:
+            item.update(mouse_pos)
+        self.start_button_m.change_size(Display.display_idx)
+        self.start_button_m.update(mouse_pos)
+        self.Uno_Button.change_size(Display.display_idx)
+        self.Uno_Button.update(mouse_pos)
+
+
     def next_screen(self):
         pass
     
@@ -764,6 +813,7 @@ class Playing(Display):
                                     self.pw_input_box.change_text(self.password)
                                     self.lobby = False
                                     self.input_active = False
+                                    self.is_computer_activated_m[0] = True
                                     return
                                 if self.button_cancel.above:
                                     self.pw_type = None
@@ -783,8 +833,10 @@ class Playing(Display):
                                     print(self.password)
                                     self.password = ''
                                     self.pw_input_box.change_text(self.password)
+                                    self.is_computer_activated_m[0] = True
                                     self.lobby = False
                                     self.input_active = False
+                                    self.req_up()
                                     return
                                 elif (event.unicode.isalpha() or event.unicode.isdigit()) and len(self.password)<=12:
                                     self.password += event.unicode
@@ -906,7 +958,7 @@ class Playing(Display):
                         if self.x >= 500:
                             self.x = 0
                             self.y += 100
-                    self.update_screen(pg.mouse.get_pos())
+                    self.update_screen_m(pg.mouse.get_pos())
                     #self.draw_computer_back()
                     #self.draw_arrow()
                     #self.draw_color_selection()
@@ -998,19 +1050,14 @@ class Playing(Display):
                 else: # 게임 대기실 화면
                     if self.host: # 방장일 때
                         if self.data is not None:
-                            if self.data["Type"] == "update": # 방에 새로운 사람이 들어오거나 컴퓨터 추가
-                                pass
-                                self.data = None
-                            elif self.data["Type"] == "remove": # 방에서 나가거나 컴퓨터 삭제
-                                self.data = None
-                            elif self.data["Type"] == "game_start":
+                            if self.data["Type"] == "game_start":
                                 self.hand_out()
                                 
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
                         self.start_button_m.draw(self.screen)
-                        self.update_screen(pg.mouse.get_pos())
+                        self.update_screen_m(pg.mouse.get_pos())
                         if self.select:
                             for idx, item in enumerate(self.button_area):
                                 item.update(pg.mouse.get_pos())
@@ -1028,13 +1075,16 @@ class Playing(Display):
                                             self.add_computer(self.where, idx)
                                             self.select = False
                                 else:
-                                    for idx, item in enumerate(self.Player_list):
-                                        if item.above:
-                                            if self.is_computer_activated[idx]:
-                                                self.remove_computer(idx)
-                                            else:
-                                                self.select = True
-                                                self.where = idx
+                                    for idx, item in enumerate(self.Player_list_m):
+                                        if idx == 0:
+                                            pass
+                                        else:
+                                            if item.above:
+                                                if self.is_computer_activated[idx]:
+                                                    self.remove_computer(idx)
+                                                else:
+                                                    self.select = True
+                                                    self.where = idx
                                     if self.start_button_m.above and self.num_of_players>=1:
                                         self.start_button_m.click()
                                     if self.name_input_box.above:
@@ -1054,16 +1104,13 @@ class Playing(Display):
                                         self.mode[C.NEXT_SCREEN] = C.STOP
                     else: # 클라이언트일 때
                         if self.data is not None:
-                            if self.data["Type"] == "update":
-                                pass# 새로운 유저 들어왔을 때
-                                self.data = None
                             if self.data["Type"] == "game_start":
                                 self.hand_out()
                                 self.data = None
                         self.screen.fill((255, 255, 255))
                         pg.draw.rect(self.screen, C.BLACK, (int(620*C.WEIGHT[Display.display_idx]), 0, 
                                                             int(180*C.WEIGHT[Display.display_idx]), int(600*C.WEIGHT[Display.display_idx])))
-                        self.update_screen(pg.mouse.get_pos())
+                        self.update_screen_m(pg.mouse.get_pos())
                         pg.display.update()
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
