@@ -14,10 +14,10 @@ class Data:
         self.djqwjr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.djqwjr_date = ['','','','','','','','','','','']
         
-        #self.load_settings()
-        self.Master_Volume = 0.5
-        self.Music_Volume = 0.5
-        self.Effect_Volume = 0.5
+        self.load_settings()
+        #self.Master_Volume = 0.5
+        #self.Music_Volume = 0.5
+        #self.Effect_Volume = 0.5
 
     @staticmethod
     def save():

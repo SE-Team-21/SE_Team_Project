@@ -9,9 +9,7 @@ from uno.play import Playing
 from uno.multi import Multi
 from uno.achievement import Achievement
 import uno.Constants as C
-from uno.KeySettings import Data
 
-Data.load_settings()
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
