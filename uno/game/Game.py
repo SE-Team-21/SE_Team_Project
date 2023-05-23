@@ -172,7 +172,6 @@ class UnoGame:
         self.tmp = False
 
     def _pick_up(self, player, n):
-        player.uno_state = False
         if self.probability == -1:
             penalty_cards = [self.deck.pop(0) for i in range(n)]
             player.hand.extend(penalty_cards)

@@ -360,7 +360,7 @@ class Playing(Display):
             if valid != who: # who가 아닌 사람이 uno일 때 who가 누른 경우
                 self.game._pick_up(valid, 1)
             else: # 내꺼 내가누름
-                self.game.players[valid].uno_state = True
+                pass
         else: 
             pass
 
@@ -400,8 +400,8 @@ class Playing(Display):
             item.draw(self.screen)
         for item in self.Card_list:
             item.update(mouse_pos)
-        self.start_button_m.change_size(Display.display_idx) # 수정
-        self.start_button_m.update(mouse_pos)
+        self.start_button.change_size(Display.display_idx)
+        self.start_button.update(mouse_pos)
         self.Uno_Button.change_size(Display.display_idx)
         self.Uno_Button.update(mouse_pos)
         
@@ -429,7 +429,7 @@ class Playing(Display):
                 self.choice_card_idx = None
                 
             if self.choice_card_idx is not None:
-                if len(player.hand) > 1 or (len(player.hand) == 1 and player.uno_state):
+                if len(player.hand) > 1 or (len(player.hand) == 1):
                     card = self.game.players[0].hand[self.choice_card_idx]
                     if self.game.current_card.playable(card):
                         if card.color == 'black':
@@ -462,7 +462,7 @@ class Playing(Display):
     def game_handler(self, running): # main
         if self.game == None:
             if C.game_mode == 0:
-                self.game = UnoGame(self.num_of_players, -1, 7)
+                self.game = UnoGame(self.num_of_players, -1, 4)
             else:
                 if C.INDEX == 0: # 지역 A 나포함 2명 50% 증가 / 기술 콤보
                     self.game = UnoGame(2, -1, 2)
@@ -501,7 +501,7 @@ class Playing(Display):
                 else:
                     for i, card in enumerate(player.hand):
                         if self.game.current_card.playable(card):
-                            if len(player.hand) > 1 or (len(player.hand) == 1 and player.uno_state):
+                            if len(player.hand) > 1 or (len(player.hand) == 1):
                                 if card.color == 'black':
                                     new_color = random.choice(C.COLORS)
                                 else:
