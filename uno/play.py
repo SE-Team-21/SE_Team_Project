@@ -126,8 +126,8 @@ class Playing(Display):
     ###################################### 멀티
     def connect(self):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
-        #self.clientSock.connect(('13.210.238.200', 10123))
-        self.clientSock.connect(('127.0.0.1', 10123))
+        self.clientSock.connect(('13.210.238.200', 10123))
+        #self.clientSock.connect(('127.0.0.1', 10123))
         self.clientSock.setblocking(False)
         print('연결 확인 됐습니다.')
         self.get_my_address()

@@ -1,4 +1,5 @@
 import pygame as pg
+from datetime import datetime
 import dill
 
 class Data:
@@ -10,11 +11,13 @@ class Data:
         self.Color = -1
         self.Clear = False
         self.name = 'You'
-        self.djqwjr = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.load_settings()
-        #self.Master_Volume = 0.5
-        #self.Music_Volume = 0.5
-        #self.Effect_Volume = 0.5
+        self.djqwjr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.djqwjr_date = ['','','','','','','','','','','']
+        
+        #self.load_settings()
+        self.Master_Volume = 0.5
+        self.Music_Volume = 0.5
+        self.Effect_Volume = 0.5
 
     @staticmethod
     def save():
@@ -22,8 +25,13 @@ class Data:
             dill.dump(Data.data, f)
     
     @staticmethod
-    def save_djqwjr(idx, status = 0):
+    def save_djqwjr(idx, status = 1):
         Data.data.djqwjr[idx] = status
+        Data.save()
+    
+    @staticmethod
+    def save_djqwjr_date(idx, date = datetime.now().date().strftime('%Y-%m-%d')):
+        Data.data.djqwjr_date[idx] = date
         Data.save()
 
     @staticmethod

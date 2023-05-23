@@ -6,6 +6,8 @@ from uno.Button_Class import Button
 import uno.Music as Music
 
 class Start(Display):
+    Data.data.save_djqwjr(8)
+    Data.data.save_djqwjr_date(8)
     def __init__(self):
         super().__init__()
         self.Button_list.append(Button((100, 150), (120, 60), 'Play', lambda x,y: self.next_screen(x,y)))

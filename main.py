@@ -9,7 +9,9 @@ from uno.play import Playing
 from uno.multi import Multi
 from uno.achievement import Achievement
 import uno.Constants as C
+from uno.KeySettings import Data
 
+Data.load_settings()
 def uno_mainloop():
     pg.init()
     pg.display.set_caption("UNO Game") # 실행 창 제목
@@ -17,7 +19,7 @@ def uno_mainloop():
     running = [True]
     while running[0]:
         Game[Display.mode[C.NEXT_SCREEN]-1].main_loop(running)
-        #Game[7].main_loop(running)
+        #Game[0].main_loop(running)
         if C.IS_GAME_END:
             Game[2] = Playing()
             C.IS_GAME_END = False
