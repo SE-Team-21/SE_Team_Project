@@ -28,10 +28,13 @@ class Room:
         data = {"Type": "update"}
         if self.game == None:
             for idx, p in enumerate(self.players):
-                if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
+                if p is None:
+                    data[idx] = None
+                elif p.is_computer:
                     data[idx] = ["Computer"+str(idx)]
                 else:
                     data[idx] = [p.name]
+            print(data)
         else:
             for idx, p in enumerate(self.players):
                 if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
@@ -40,7 +43,7 @@ class Room:
                     data[idx] = [p.name, len(p.hand)]
         for p in self.players:
             if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
-                    pass
+                pass
             else:
                 p = p.sock
                 p[0].send(E.Encrypt_A(data))
@@ -51,6 +54,7 @@ class Player:
         self.sock = sock
         self.name = name
         self.is_computer = is_computer
+        self.room = None
 while True:
     readable, _, _ = select.select([serverSock], [], [], 0)
     for sock in readable:
@@ -75,7 +79,7 @@ while True:
                     g = room.game
                     for idx, p in enumerate(room.players):
                         p = p.sock
-                        if p is None or p is str: # 빈자리거나 컴퓨터일 때
+                        if p is None or p.is_computer: # 빈자리거나 컴퓨터일 때
                             pass
                         else:
                             print(p[0])
@@ -94,31 +98,28 @@ while True:
                     for room in rooms:
                         if player in room.players:
                             print("exist")
-                            if p is None or p is str: # 빈자리거나 컴퓨터일 때
-                                pass
-                            else:
-                                data = {"Type": "update_r", "Num": len(room.players)}
-                                for p in room.players:
-                                    for idx, p in enumerate(room.players):
-                                        if p is None or p is str: # 빈자리거나 컴퓨터일 때
-                                            data[idx] = False
-                                        else:
-                                            pass
-                                for p in room.players:
-                                    p[0].send(E.Encrypt_A({"Type": "update", "is_com": True, "Index": data["Index"]}))
+                            room.players[data["Index"]] = Player(1, 1, True)
+                            room.broadcast_update()
                 elif data["Type"] == "mkr":
-                    rooms.append(Room(data["Password"], player[1][0], player[1][1], Player(player)))
+                    temp = Room(data["Password"], player[1][0], player[1][1], Player(player, data["Name"]))
+                    temp.players[0].room = temp
+                    rooms.append(temp)
                     player[0].send(E.Encrypt_A({"Type": "ip", "address": player[1][0]}))
                 elif data["Type"] == "pw":
                     for room in rooms:
                         if room.address == data["Host_IP"] and room.port == data["Host_PORT"]:
                             if Check(data["Password"], room.password):
                                 if room.num_of_com + len(room.players) <= 6:
-                                    for p in room.players: # 성공적으로 방에 들어왔을 때 방에 있는 사람들에게
-                                        p[0].send(E.Encrypt_A({"Type":"update", "is_com": False, "Index": len(room.players)}))
-                                        pass # 들어온 사람의 정보를 알려야 함
-                                    room.players.append(player)
+                                    print(room.players)
+                                    temp = Player(player, data["Name"])
+                                    temp.room = room
+                                    for idx, i in enumerate(room.players):
+                                        if i is None:
+                                            room.players[idx] = temp
+                                            print(1)
+                                            break
                                     player[0].send(E.Encrypt_A({"Type": "Correct"}))
+                                    room.broadcast_update()
 
                                 else: # 방에 자리가 없을 때
                                     pass
@@ -134,25 +135,26 @@ while True:
                     player[0].send(E.Encrypt_A(data))
                 elif data["Type"] == "gma":
                     player[0].send(E.Encrypt_A({"Type": "myip", "address": player[1][0]}))
+                elif data["Type"] == "update":
+                    for room in rooms:
+                        for p in room.players:
+                            if p.sock[1][0] == player[1][0] and p.sock[1][1] == player[1][1]:
+                                room.broadcast_update()
                 elif data["Type"] == "exit":
                     for room in rooms:
-                        if player in room.players:
-                            room.players.remove(player) # None으로 바꿔줘야됨
-                            if len(room.players) == 0:
-                                rooms.remove(room)
-                            else: # 다른 사람에게 방장 넘겨줌
+                        for p in room.players:
+                            if p.is_computer:
                                 pass
-                            break
+                            else:
+                                if p.sock[1][0] == player[1][0] and p.sock[1][1] == player[1][1]:
+                                    room.players.remove(p)
+                                if len(room.players) == 0:
+                                    rooms.remove(room)
+                                else: # 다른 사람에게 방장 넘겨줌
+                                    pass
+                                break
 
 
 
         except:
-            players.remove(player)
-            for room in rooms:
-                if player in room.players:
-                    room.players.remove(player)
-                    if len(room.players) == 0:
-                                rooms.remove(room)
-                    else: # 다른 사람에게 방장 넘겨줌
-                        pass
-                    break
+            pass
